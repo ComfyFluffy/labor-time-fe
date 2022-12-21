@@ -10,7 +10,7 @@ import produce from 'immer'
 let itemLocalId = 0
 
 export type NewItem = Pick<Item, 'description' | 'picture_urls'> & {
-  duration_hour: string
+  duration_hour: number
   local_id: number
   category_id: number
 }
@@ -22,106 +22,106 @@ type UpdateItem = Pick<
   'id' | 'description' | 'duration_hour' | 'picture_urls'
 >
 
-export const User = () => {
-  const data: Category[] = [
-    {
-      id: 1,
-      name: '一级课堂',
-      editable: true,
-      explanation: {
-        title: '志愿服务类学时认定说明',
-        text: '参加学院组织的勤工助学岗位、学生助理岗位并积极完成工作者，按每学期可申报 5 个学时（需勤工岗位部门认定）；在校期间参与志愿服务，志愿服务时长 2 小时计劳动实践 1 学时（志愿服务工作，按所在服务单位开具的加盖部门公章证明为参考，由院团委核定为准，10 学时封顶）。',
+const data: Category[] = [
+  {
+    id: 1,
+    name: '一级课堂',
+    editable: true,
+    explanation: {
+      title: '志愿服务类学时认定说明',
+      text: '参加学院组织的勤工助学岗位、学生助理岗位并积极完成工作者，按每学期可申报 5 个学时（需勤工岗位部门认定）；在校期间参与志愿服务，志愿服务时长 2 小时计劳动实践 1 学时（志愿服务工作，按所在服务单位开具的加盖部门公章证明为参考，由院团委核定为准，10 学时封顶）。',
+    },
+    max_total_hour: 30,
+    items: [
+      {
+        id: 123,
+        description: '优秀寝室',
+        duration_hour: 6,
+        state: 'approved',
+        picture_urls: ['/1.jpg', '/2.jpg'],
       },
-      max_total_hour: 30,
-      items: [
-        {
-          id: 123,
-          description: '优秀寝室',
-          duration_hour: 6,
-          state: 'approved',
-          picture_urls: ['/1.jpg', '/2.jpg'],
-        },
-        {
-          id: 1234,
-          description: '优秀寝室',
-          duration_hour: 6,
-          state: 'rejected',
-          rejected_reason: '证据无效',
-          picture_urls: ['/3.jpg', '/4.jpg'],
-        },
-        {
-          id: 12345,
-          description: '优秀寝室',
-          duration_hour: 6,
-          state: 'pending',
-          picture_urls: ['/5.jpg', '/6.jpg'],
-        },
-        {
-          id: 123245,
-          description: '优秀寝室',
-          duration_hour: 6,
-          picture_urls: ['/7.jpg'],
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: '二三级课堂',
-      max_total_hour: 20,
-      editable: true,
-      items: [
-        {
-          id: 234,
-          description: 'whatever',
-          duration_hour: 6,
-          state: 'rejected',
-          picture_urls: [
-            'https://picsum.photos/400/300',
-            'https://picsum.photos/400/300',
-          ],
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: '志愿服务类',
-      explanation: {
-        title: '志愿服务类学时认定说明',
-        text: '参加学院组织的勤工助学岗位、学生助理岗位并积极完成工作者，按每学期可申报 5 个学时（需勤工岗位部门认定）；在校期间参与志愿服务，志愿服务时长 2 小时计劳动实践 1 学时（志愿服务工作，按所在服务单位开具的加盖部门公章证明为参考，由院团委核定为准，10 学时封顶）。',
+      {
+        id: 1234,
+        description: '优秀寝室',
+        duration_hour: 6,
+        state: 'rejected',
+        rejected_reason: '证据无效',
+        picture_urls: ['/3.jpg', '/4.jpg'],
       },
-      editable: true,
-      items: [
-        {
-          id: 3,
-          description: '志愿服务类',
-          duration_hour: 6,
-          picture_urls: [
-            'https://picsum.photos/400/300',
-            'https://picsum.photos/400/300',
-          ],
-          state: 'pending',
-        },
-      ],
+      {
+        id: 12345,
+        description: '优秀寝室',
+        duration_hour: 6,
+        state: 'pending',
+        picture_urls: ['/5.jpg', '/6.jpg'],
+      },
+      {
+        id: 123245,
+        description: '优秀寝室',
+        duration_hour: 6,
+        picture_urls: ['/7.jpg'],
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: '二三级课堂',
+    max_total_hour: 20,
+    editable: true,
+    items: [
+      {
+        id: 234,
+        description: 'whatever',
+        duration_hour: 6,
+        state: 'rejected',
+        picture_urls: [
+          'https://picsum.photos/400/300',
+          'https://picsum.photos/400/300',
+        ],
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: '志愿服务类',
+    explanation: {
+      title: '志愿服务类学时认定说明',
+      text: '参加学院组织的勤工助学岗位、学生助理岗位并积极完成工作者，按每学期可申报 5 个学时（需勤工岗位部门认定）；在校期间参与志愿服务，志愿服务时长 2 小时计劳动实践 1 学时（志愿服务工作，按所在服务单位开具的加盖部门公章证明为参考，由院团委核定为准，10 学时封顶）。',
     },
-    {
-      id: 5,
-      name: '社会实践类',
-      editable: true,
-      items: [
-        {
-          id: 45,
-          state: 'pending',
-          description: '社会实践类',
-          duration_hour: 6,
-          picture_urls: [
-            'https://picsum.photos/400/300',
-            'https://picsum.photos/400/300',
-          ],
-        },
-      ],
-    },
-  ]
+    editable: true,
+    items: [
+      {
+        id: 3,
+        description: '志愿服务类',
+        duration_hour: 6,
+        picture_urls: [
+          'https://picsum.photos/400/300',
+          'https://picsum.photos/400/300',
+        ],
+        state: 'pending',
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: '社会实践类',
+    editable: true,
+    items: [
+      {
+        id: 45,
+        state: 'pending',
+        description: '社会实践类',
+        duration_hour: 6,
+        picture_urls: [
+          'https://picsum.photos/400/300',
+          'https://picsum.photos/400/300',
+        ],
+      },
+    ],
+  },
+]
 
+export const User = () => {
   const [categories, setCategories] = useState(data)
 
   const [currentItemIndex, setCurrentItemIndex] = useState(0)
@@ -130,33 +130,35 @@ export const User = () => {
     added: Map<number, NewItem> // local id -> item
     updated: Map<number, UpdateItem> // item id -> item
     removedIds: Set<number>
-  }>({
+  }>(() => ({
     added: new Map(),
     updated: new Map(),
     removedIds: new Set(),
-  })
+  }))
 
-  const localCategories: CategoryWithNewItem[] = useMemo(() => {
-    return produce(categories, (draft) => {
-      for (const category of draft) {
-        category.items = category.items
-          .filter((item) => !itemsActions.removedIds.has(item.id))
-          .map((item) => {
-            const updatedItem = itemsActions.updated.get(item.id)
-            if (updatedItem) {
-              Object.assign(item, updatedItem)
+  const localCategories: CategoryWithNewItem[] = useMemo(
+    () =>
+      produce(categories, (draft) => {
+        for (const category of draft) {
+          category.items = category.items
+            .filter((item) => !itemsActions.removedIds.has(item.id))
+            .map((item) => {
+              const updatedItem = itemsActions.updated.get(item.id)
+              if (updatedItem) {
+                Object.assign(item, updatedItem)
+              }
+              return item
+            })
+
+          for (const item of itemsActions.added.values()) {
+            if (item.category_id === category.id) {
+              ;(category as CategoryWithNewItem).items.push(item)
             }
-            return item
-          })
-
-        for (const item of itemsActions.added.values()) {
-          if (item.category_id === category.id) {
-            ;(category as CategoryWithNewItem).items.push(item)
           }
         }
-      }
-    })
-  }, [categories, itemsActions])
+      }),
+    [categories, itemsActions]
+  )
 
   const currentCategory = localCategories[currentItemIndex]
 
@@ -197,7 +199,7 @@ export const User = () => {
                 const newItem: NewItem = {
                   category_id: currentCategory.id,
                   description: '',
-                  duration_hour: '',
+                  duration_hour: '' as any,
                   picture_urls: [],
                   local_id: itemLocalId++,
                 }

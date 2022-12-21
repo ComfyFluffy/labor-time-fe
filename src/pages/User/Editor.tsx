@@ -15,15 +15,14 @@ import {
   Typography,
   typographyClasses,
 } from '@mui/joy'
+import { alpha, darken, lighten, Unstable_Grid2 as Grid } from '@mui/material'
 import RemoveIcon from '@mui/icons-material/Remove'
-import Grid from '@mui/material/Unstable_Grid2'
 import ErrorIcon from '@mui/icons-material/Error'
 import CloseIcon from '@mui/icons-material/Close'
 import AddIcon from '@mui/icons-material/Add'
 import PendingIcon from '@mui/icons-material/Pending'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { CategoryExplanation, Item, ItemState } from '../../model'
-import { alpha, darken, lighten } from '@mui/material'
 import { CategoryWithNewItem, NewItem } from '.'
 import { useMemo } from 'react'
 
@@ -266,12 +265,27 @@ const ItemEditor = ({
             width: 0o100,
           }}
           value={item.duration_hour}
-          onChange={(e) => onChange({ ...item, duration_hour: e.target.value })}
+          onChange={(e) =>
+            onChange({
+              ...item,
+              duration_hour: e.target.value as any, // TODO: use a form validation library
+            })
+          }
         />
         <Typography level="body2">证明材料</Typography>
         <Grid container columns={{ xs: 3, sm: 4, md: 7 }} spacing={1}>
           {item.picture_urls.map((src) => (
-            <ImgItem key={src} editable={itemEditable} src={src} />
+            <ImgItem
+              key={src}
+              editable={itemEditable}
+              src={src}
+              onRemove={() => {
+                onChange({
+                  ...item,
+                  picture_urls: item.picture_urls.filter((url) => url !== src),
+                })
+              }}
+            />
           ))}
           {itemEditable && (
             <Grid xs={1}>

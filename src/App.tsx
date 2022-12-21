@@ -3,7 +3,7 @@ import { RouterProvider } from 'react-router-dom'
 import { router } from './router'
 import { theme } from './theme'
 
-const App = () => {
+export const App = () => {
   return (
     <CssVarsProvider defaultMode="system" theme={theme}>
       <CssBaseline />
@@ -12,5 +12,3 @@ const App = () => {
     </CssVarsProvider>
   )
 }
-
-export default App
