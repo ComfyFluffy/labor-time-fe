@@ -12,12 +12,14 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.10.16",
-    "@mui/joy": "^5.0.0-alpha.56",
-    "@mui/material": "^5.11.0",
+    "@mui/joy": "^5.0.0-alpha.59",
+    "@mui/material": "^5.11.1",
     "immer": "^9.0.16",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.4.3"
+    "react-router-dom": "^6.5.0",
+    "swr": "^2.0.0",
+    "zustand": "^4.1.5"
   },
   "devDependencies": {
     "@types/react": "^18.0.24",
@@ -28,6 +30,6 @@
     "eslint": "^8.30.0",
     "eslint-plugin-react": "^7.31.11",
     "typescript": "^4.6.4",
-    "vite": "^4.0.1"
+    "vite": "^4.0.3"
   }
 }
