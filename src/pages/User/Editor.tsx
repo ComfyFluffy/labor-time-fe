@@ -24,7 +24,7 @@ import PendingIcon from '@mui/icons-material/Pending'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { CategoryExplanation, Item, ItemState } from '../../model'
 import { CategoryWithNewItem, NewItem } from '.'
-import { useMemo } from 'react'
+import { ReactNode, useMemo } from 'react'
 
 const transparentBackground = (theme: Theme) =>
   theme.palette.mode === 'dark'
@@ -84,7 +84,7 @@ const ImgItem = ({
   src,
 }: {
   onRemove?: () => void
-  editable: boolean
+  editable?: boolean
   src: string
 }) => (
   <Grid
@@ -139,28 +139,36 @@ const Explanation = ({
   )
 }
 
-const ItemEditor = ({
+export const ItemEditor = ({
   item,
   editable,
   onRemove,
   onChange,
+  viewMode,
+  action,
 }: {
   item: Item | NewItem
-  editable: boolean
-  onRemove: (item: Item | NewItem) => void
-  onChange: (item: Item | NewItem) => void
+  editable?: boolean
+  onRemove?: (item: Item | NewItem) => void
+  onChange?: (item: Item | NewItem) => void
+  viewMode?: boolean
+  action?: ReactNode
 }) => {
+  editable = editable && !viewMode
+
   const itemEditable =
     editable && (!('state' in item) || item.state === 'rejected')
 
-  const stateAlert: Record<
-    ItemState,
-    {
-      color: AlertProps['color']
-      Icon: React.ComponentType
-      title: string
-      reason?: string
-    }
+  const stateAlert: Partial<
+    Record<
+      ItemState,
+      {
+        color: AlertProps['color']
+        Icon: React.ComponentType
+        title: string
+        reason?: string
+      }
+    >
   > = {
     approved: {
       color: 'success',
@@ -175,11 +183,15 @@ const ItemEditor = ({
         ('rejected_reason' in item && '原因：' + item.rejected_reason) ||
         undefined,
     },
-    pending: {
-      color: 'warning',
-      Icon: PendingIcon,
-      title: '此项目正在审核中。如要修改，请联系辅导员打回',
-    },
+    ...(viewMode
+      ? undefined
+      : {
+          pending: {
+            color: 'warning',
+            Icon: PendingIcon,
+            title: '此项目正在审核中。如要修改，请联系辅导员打回',
+          },
+        }),
   }
   const currentAlert = ('state' in item && stateAlert[item.state]) || undefined
 
@@ -187,7 +199,12 @@ const ItemEditor = ({
     <Card
       sx={(theme) => {
         const isDark = theme.palette.mode === 'dark'
-        const backgrounds: Record<ItemState, string> = {
+
+        const primary = isDark
+          ? darken(theme.palette.primary[900], 0.6)
+          : theme.palette.primary[50]
+
+        const backgrounds = {
           approved: isDark
             ? darken(theme.palette.success[900], 0.6)
             : theme.palette.success[50],
@@ -196,22 +213,25 @@ const ItemEditor = ({
             ? darken(theme.palette.danger[900], 0.6)
             : theme.palette.danger[50],
 
-          pending: isDark
+          pending: viewMode
+            ? primary
+            : isDark
             ? darken(theme.palette.warning[900], 0.6)
             : lighten(theme.palette.warning[50], 0.8),
         }
         return {
-          background:
-            'state' in item
-              ? backgrounds[item.state]
-              : isDark
-              ? darken(theme.palette.primary[900], 0.6)
-              : theme.palette.primary[50],
+          background: 'state' in item ? backgrounds[item.state] : primary,
         }
       }}
     >
       <Stack spacing={1}>
-        <Stack direction="row" alignItems="center">
+        <Stack
+          direction="row"
+          alignItems="center"
+          sx={{
+            mb: !currentAlert ? -2 : undefined,
+          }}
+        >
           {currentAlert ? (
             <Alert
               color={currentAlert.color}
@@ -241,7 +261,11 @@ const ItemEditor = ({
           )}
 
           {itemEditable && (
-            <IconButton size="sm" color="danger" onClick={() => onRemove(item)}>
+            <IconButton
+              size="sm"
+              color="danger"
+              onClick={onRemove && (() => onRemove(item))}
+            >
               <RemoveIcon />
             </IconButton>
           )}
@@ -253,7 +277,10 @@ const ItemEditor = ({
           variant="outlined"
           color={currentAlert?.color || 'primary'}
           value={item.description}
-          onChange={(e) => onChange({ ...item, description: e.target.value })}
+          onChange={
+            onChange &&
+            ((e) => onChange({ ...item, description: e.target.value }))
+          }
         />
         <StyledTextField
           label="学时"
@@ -265,11 +292,13 @@ const ItemEditor = ({
             width: 0o100,
           }}
           value={item.duration_hour}
-          onChange={(e) =>
-            onChange({
-              ...item,
-              duration_hour: e.target.value as any, // TODO: use a form validation library
-            })
+          onChange={
+            onChange &&
+            ((e) =>
+              onChange({
+                ...item,
+                duration_hour: e.target.value as any, // TODO: use a form validation library
+              }))
           }
         />
         <Typography level="body2">证明材料</Typography>
@@ -279,12 +308,17 @@ const ItemEditor = ({
               key={src}
               editable={itemEditable}
               src={src}
-              onRemove={() => {
-                onChange({
-                  ...item,
-                  picture_urls: item.picture_urls.filter((url) => url !== src),
+              onRemove={
+                onChange &&
+                (() => {
+                  onChange({
+                    ...item,
+                    picture_urls: item.picture_urls.filter(
+                      (url) => url !== src
+                    ),
+                  })
                 })
-              }}
+              }
             />
           ))}
           {itemEditable && (
@@ -293,6 +327,7 @@ const ItemEditor = ({
             </Grid>
           )}
         </Grid>
+        {action}
       </Stack>
     </Card>
   )

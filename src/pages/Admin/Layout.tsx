@@ -1,8 +1,16 @@
 import {
   Box,
+  Chip,
   Container,
   IconButton,
   IconButtonProps,
+  List,
+  ListDivider,
+  ListItem,
+  ListItemButton,
+  listItemButtonClasses,
+  ListItemContent,
+  ListItemDecorator,
   Stack,
   Typography,
 } from '@mui/joy'
@@ -17,8 +25,13 @@ import {
 import MenuIcon from '@mui/icons-material/Menu'
 import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
+import GroupsIcon from '@mui/icons-material/Groups'
+import InsightsIcon from '@mui/icons-material/Insights'
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
+import ImportExportIcon from '@mui/icons-material/ImportExport'
 
-const drawerWidth = 0o350
+const drawerWidth = 0o400
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean
@@ -56,6 +69,8 @@ const NavBar = ({
     </IconButton>
   )
 
+  const theme = useTheme()
+
   return (
     <Stack
       spacing={2}
@@ -85,7 +100,10 @@ const NavBar = ({
         <Collapse
           in={showMenuButton}
           orientation="horizontal"
-          timeout={225} // Match the drawer
+          timeout={{
+            enter: theme.transitions.duration.enteringScreen,
+            exit: theme.transitions.duration.leavingScreen,
+          }} // Match the drawer
         >
           {menuButton}
         </Collapse>
@@ -127,17 +145,105 @@ const NavDrawer = ({ setOpen, open, variant }: NavDrawerProps) => {
       variant={variant}
       anchor="left"
     >
-      <Stack
-        direction="row"
-        alignItems="center"
-        sx={{
-          height: 0o100,
-          px: 2,
-        }}
-      >
-        <IconButton variant="plain" onClick={() => setOpen(!open)}>
-          <MenuIcon />
-        </IconButton>
+      <Stack>
+        <Stack
+          direction="row"
+          alignItems="center"
+          sx={{
+            height: 0o100,
+            px: 2,
+          }}
+        >
+          <IconButton variant="plain" onClick={() => setOpen(!open)}>
+            <MenuIcon />
+          </IconButton>
+        </Stack>
+
+        <List
+          sx={{
+            fontWeight: '500',
+            userSelect: 'none',
+          }}
+        >
+          <ListItem>
+            <ListItemButton>
+              <Stack
+                sx={{
+                  pl: 2,
+                }}
+                spacing={1}
+                alignItems="start"
+              >
+                <Stack direction="row" alignItems="baseline" spacing={1}>
+                  <Typography fontSize="xl">黄安</Typography>
+                  <Typography fontSize="xs">12345678890</Typography>
+                </Stack>
+                <Chip size="sm">院级管理员</Chip>
+              </Stack>
+            </ListItemButton>
+          </ListItem>
+
+          <ListDivider />
+
+          <ListItem>
+            <ListItemButton>
+              <ListItemDecorator>
+                <InsightsIcon />
+              </ListItemDecorator>
+              <ListItemContent>数据概览</ListItemContent>
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem nested>
+            <ListItemButton>
+              <ListItemDecorator>
+                <GroupsIcon />
+              </ListItemDecorator>
+              <ListItemContent>班级列表</ListItemContent>
+              <KeyboardArrowRightIcon />
+            </ListItemButton>
+
+            <Collapse in>
+              <List
+                sx={{
+                  [`& .${listItemButtonClasses.root}`]: {
+                    pl: 7,
+                  },
+                  [`& .${listItemButtonClasses.selected}`]: {
+                    fontWeight: 'inherit',
+                  },
+                }}
+              >
+                <ListItem>
+                  <ListItemButton>计算机 II 类 2114 班</ListItemButton>
+                </ListItem>
+                <ListItem>
+                  <ListItemButton selected>计算机 II 类 2115 班</ListItemButton>
+                </ListItem>
+              </List>
+            </Collapse>
+          </ListItem>
+
+          <ListDivider />
+
+          <ListItem>
+            <ListItemButton>
+              <ListItemDecorator>
+                <SupervisorAccountIcon />
+              </ListItemDecorator>
+              <ListItemContent>用户管理</ListItemContent>
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem>
+            <ListItemButton>
+              <ListItemDecorator>
+                <ImportExportIcon />
+              </ListItemDecorator>
+              <ListItemContent>数据导入 / 导出</ListItemContent>
+            </ListItemButton>
+          </ListItem>
+        </List>
       </Stack>
     </Drawer>
   )
@@ -145,7 +251,6 @@ const NavDrawer = ({ setOpen, open, variant }: NavDrawerProps) => {
 
 export const Layout = () => {
   const theme = useTheme()
-  console.log(theme)
 
   const upLg = useMediaQuery(theme.breakpoints.up('lg'))
 
@@ -171,7 +276,7 @@ export const Layout = () => {
         <Container
           maxWidth={false}
           sx={{
-            pt: 1,
+            py: 1,
           }}
         >
           <Outlet />

@@ -31,3 +31,9 @@ export interface Student {
   dormitory: string
   total_hours: number
 }
+
+export interface Admin {
+  id: number
+  name: string
+  phone: string
+}

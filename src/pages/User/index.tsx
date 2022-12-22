@@ -1,4 +1,13 @@
-import { Button, Container, Stack, Typography } from '@mui/joy'
+import {
+  Button,
+  Container,
+  Divider,
+  Modal,
+  ModalClose,
+  ModalDialog,
+  Stack,
+  Typography,
+} from '@mui/joy'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import { Editor } from './Editor'
@@ -6,6 +15,9 @@ import { Category, Item } from '../../model'
 import PublishIcon from '@mui/icons-material/Publish'
 import { useEffect, useMemo, useState } from 'react'
 import produce from 'immer'
+import { usePreferences } from '../../store'
+import shallow from 'zustand/shallow'
+import { StudentInfo } from '../../components/StudentInfo'
 
 let itemLocalId = 0
 
@@ -60,7 +72,7 @@ const data: Category[] = [
         description: '优秀寝室',
         duration_hour: 6,
         picture_urls: ['/7.jpg'],
-      },
+      } as any,
     ],
   },
   {
@@ -121,6 +133,35 @@ const data: Category[] = [
   },
 ]
 
+const ConfirmPersonalInfo = () => {
+  const { confirmPersonalInfo, personalInfoConfirmed } = usePreferences(
+    (state) => ({
+      confirmPersonalInfo: state.confirmPersonalInfo,
+      personalInfoConfirmed: state.personalInfoConfirmed,
+    }),
+    shallow
+  )
+
+  return (
+    <Modal open={!personalInfoConfirmed}>
+      <ModalDialog>
+        <Stack spacing={2}>
+          <Stack spacing={1}>
+            <Typography level="h4">个人信息</Typography>
+            <Typography>请确认你的个人信息，如有错误请联系辅导员</Typography>
+          </Stack>
+
+          <StudentInfo student={null} />
+
+          <Button variant="solid" onClick={() => confirmPersonalInfo()}>
+            确认
+          </Button>
+        </Stack>
+      </ModalDialog>
+    </Modal>
+  )
+}
+
 export const User = () => {
   const [categories, setCategories] = useState(data)
 
@@ -144,10 +185,10 @@ export const User = () => {
             .filter((item) => !itemsActions.removedIds.has(item.id))
             .map((item) => {
               const updatedItem = itemsActions.updated.get(item.id)
-              if (updatedItem) {
-                Object.assign(item, updatedItem)
+              return {
+                ...item,
+                ...updatedItem,
               }
-              return item
             })
 
           for (const item of itemsActions.added.values()) {
@@ -173,6 +214,8 @@ export const User = () => {
         py: 2,
       }}
     >
+      <ConfirmPersonalInfo />
+
       <Stack spacing={2}>
         <Typography level="h4">学生劳动实践学时认定</Typography>
 
