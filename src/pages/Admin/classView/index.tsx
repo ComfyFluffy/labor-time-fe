@@ -1,5 +1,6 @@
 import { Box, Stack, Typography } from '@mui/joy'
 import { DataGrid } from '@mui/x-data-grid'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Student } from '../../../model'
 import { Viewer } from './Viewer'
@@ -99,9 +100,14 @@ export const ClassView = () => {
     ] as Student[],
   }
 
+  const [viewerItem, setViewerItem] = useState<Student | null>(null)
+
   return (
     <Stack>
-      <Viewer student={data.students[0]} />
+      <Viewer
+        student={viewerItem || data.students[0]}
+        open={viewerItem !== null}
+      />
       <Typography level="h3">{data.name}</Typography>
       <Box
         sx={{

@@ -1,5 +1,17 @@
-import { Box, Container, inputClasses, Link, Stack, Typography } from '@mui/joy'
+import {
+  Alert,
+  Box,
+  Container,
+  inputClasses,
+  Link,
+  Stack,
+  Typography,
+} from '@mui/joy'
 import { Button, TextField } from '@mui/material'
+import { AxiosError } from 'axios'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { http } from '../../http'
 const Circle = ({
   size,
   color,
@@ -68,8 +80,30 @@ const Background = () => {
 }
 
 export const Login = () => {
+  const [credentials, setCredentials] = useState({
+    account: '',
+    password: '',
+  })
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const nav = useNavigate()
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    ;(async () => {
+      try {
+        setSubmitting(true)
+        await http.login(credentials, 'student')
+        nav('/student')
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          setErrorMessage(err.response?.data.type)
+        }
+      } finally {
+        setSubmitting(false)
+      }
+    })()
   }
 
   return (
@@ -85,7 +119,7 @@ export const Login = () => {
       <Background />
 
       <Stack
-        spacing={6}
+        spacing={5}
         sx={{
           width: 1,
           [`& .${inputClasses.root}`]: {
@@ -104,14 +138,36 @@ export const Login = () => {
             maxWidth: 0o450,
           }}
         >
-          <TextField label="学号" color="primary" fullWidth required />
+          <TextField
+            label="学号"
+            color="primary"
+            fullWidth
+            required
+            value={credentials.account}
+            onChange={(event) =>
+              setCredentials({
+                ...credentials,
+                account: event.target.value,
+              })
+            }
+            error={!!errorMessage}
+          />
           <TextField
             type="password"
             label="密码"
             color="primary"
             fullWidth
             required
+            value={credentials.password}
+            onChange={(event) =>
+              setCredentials({
+                ...credentials,
+                password: event.target.value,
+              })
+            }
+            error={!!errorMessage}
           />
+          {errorMessage && <Alert color="danger">{errorMessage}</Alert>}
         </Stack>
 
         <Link

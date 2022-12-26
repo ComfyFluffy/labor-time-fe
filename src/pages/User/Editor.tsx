@@ -15,7 +15,13 @@ import {
   Typography,
   typographyClasses,
 } from '@mui/joy'
-import { alpha, darken, lighten, Unstable_Grid2 as Grid } from '@mui/material'
+import {
+  alpha,
+  darken,
+  lighten,
+  Portal,
+  Unstable_Grid2 as Grid,
+} from '@mui/material'
 import RemoveIcon from '@mui/icons-material/Remove'
 import ErrorIcon from '@mui/icons-material/Error'
 import CloseIcon from '@mui/icons-material/Close'
@@ -24,7 +30,10 @@ import PendingIcon from '@mui/icons-material/Pending'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { CategoryExplanation, Item, ItemState } from '../../model'
 import { CategoryWithNewItem, NewItem } from '.'
-import { ReactNode, useMemo } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
+import ImageViewer from 'react-simple-image-viewer'
+import { http } from '../../http'
+import { toast, useToast } from 'react-toastify'
 
 const transparentBackground = (theme: Theme) =>
   theme.palette.mode === 'dark'
@@ -41,7 +50,7 @@ const StyledTextField = styled(TextField)(({ theme, color }) => ({
   },
 }))
 
-const UploadButton = () => {
+const UploadButton = ({ onUpload }: { onUpload: (file: File) => void }) => {
   return (
     <Sheet
       color="primary"
@@ -74,6 +83,24 @@ const UploadButton = () => {
           （最多 3 项）
         </Typography>
       </Box>
+      <input
+        type="file"
+        accept="image/*"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: 0,
+        }}
+        onChange={(event) => {
+          const file = event.target.files?.[0]
+          if (file) {
+            onUpload(file)
+          }
+        }}
+      />
     </Sheet>
   )
 }
@@ -82,10 +109,12 @@ const ImgItem = ({
   onRemove,
   editable,
   src,
+  onClick,
 }: {
   onRemove?: () => void
   editable?: boolean
   src: string
+  onClick?: () => void
 }) => (
   <Grid
     xs={1}
@@ -94,6 +123,7 @@ const ImgItem = ({
     }}
   >
     <Box
+      onClick={onClick}
       sx={{
         background: `url(${src})`,
         height: 0o160,
@@ -123,6 +153,34 @@ const ImgItem = ({
     )}
   </Grid>
 )
+
+const ImgViewer = ({
+  src,
+  onClose,
+  currentIndex,
+}: {
+  src: string[]
+  onClose: () => void
+  currentIndex: number
+}) => {
+  return (
+    <Portal>
+      <Box
+        sx={{
+          zIndex: 30000,
+          position: 'fixed',
+        }}
+      >
+        <ImageViewer
+          src={src}
+          currentIndex={currentIndex}
+          closeOnClickOutside
+          onClose={onClose}
+        />
+      </Box>
+    </Portal>
+  )
+}
 
 const Explanation = ({
   explanation: { text, title },
@@ -154,6 +212,8 @@ export const ItemEditor = ({
   viewMode?: boolean
   action?: ReactNode
 }) => {
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null)
+
   editable = editable && !viewMode
 
   const itemEditable =
@@ -189,7 +249,9 @@ export const ItemEditor = ({
           pending: {
             color: 'warning',
             Icon: PendingIcon,
-            title: '此项目正在审核中。如要修改，请联系辅导员打回',
+            title:
+              '此项目正在审核中' +
+              (editable ? '，如要修改请联系辅导员打回' : ''),
           },
         }),
   }
@@ -277,9 +339,8 @@ export const ItemEditor = ({
           variant="outlined"
           color={currentAlert?.color || 'primary'}
           value={item.description}
-          onChange={
-            onChange &&
-            ((e) => onChange({ ...item, description: e.target.value }))
+          onChange={(e) =>
+            onChange && onChange({ ...item, description: e.target.value })
           }
         />
         <StyledTextField
@@ -292,41 +353,64 @@ export const ItemEditor = ({
             width: 0o100,
           }}
           value={item.duration_hour}
-          onChange={
+          onChange={(e) =>
             onChange &&
-            ((e) =>
-              onChange({
-                ...item,
-                duration_hour: e.target.value as any, // TODO: use a form validation library
-              }))
+            onChange({
+              ...item,
+              duration_hour: e.target.value as any, // TODO: use a form validation library
+            })
           }
         />
         <Typography level="body2">证明材料</Typography>
         <Grid container columns={{ xs: 3, sm: 4, md: 7 }} spacing={1}>
-          {item.picture_urls.map((src) => (
-            <ImgItem
-              key={src}
-              editable={itemEditable}
-              src={src}
-              onRemove={
-                onChange &&
-                (() => {
-                  onChange({
-                    ...item,
-                    picture_urls: item.picture_urls.filter(
-                      (url) => url !== src
-                    ),
-                  })
-                })
-              }
-            />
-          ))}
+          {item.picture_urls &&
+            item.picture_urls.map((src, index) => (
+              <ImgItem
+                key={src}
+                editable={itemEditable}
+                src={src}
+                onRemove={() => {
+                  onChange &&
+                    onChange({
+                      ...item,
+                      picture_urls: item.picture_urls.filter(
+                        (url) => url !== src
+                      ),
+                    })
+                }}
+                onClick={() => setViewerIndex(index)}
+              />
+            ))}
           {itemEditable && (
             <Grid xs={1}>
-              <UploadButton />
+              <UploadButton
+                onUpload={(file) => {
+                  ;(async () => {
+                    try {
+                      const url = await http.uploadFile(file)
+                      onChange &&
+                        onChange({
+                          ...item,
+                          picture_urls: [...(item.picture_urls || []), url],
+                        })
+                    } catch (error) {
+                      toast.error('上传失败：' + String(error))
+                    }
+                  })()
+                }}
+              />
             </Grid>
           )}
         </Grid>
+
+        {viewerIndex !== null && (
+          <ImgViewer
+            src={item.picture_urls}
+            currentIndex={viewerIndex}
+            onClose={() => setViewerIndex(null)}
+          />
+        )}
+
         {action}
       </Stack>
     </Card>

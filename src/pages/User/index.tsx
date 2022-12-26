@@ -1,4 +1,6 @@
 import {
+  Alert,
+  Box,
   Button,
   Container,
   Divider,
@@ -13,11 +15,15 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import { Editor } from './Editor'
 import { Category, Item } from '../../model'
 import PublishIcon from '@mui/icons-material/Publish'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import produce from 'immer'
 import { usePreferences } from '../../store'
 import shallow from 'zustand/shallow'
 import { StudentInfo } from '../../components/StudentInfo'
+import { AddItemRequest, http, UpdateItemRequest } from '../../http'
+import { toast } from 'react-toastify'
+import { AxiosError } from 'axios'
+import { Me } from './Me'
 
 let itemLocalId = 0
 
@@ -34,105 +40,6 @@ type UpdateItem = Pick<
   'id' | 'description' | 'duration_hour' | 'picture_urls'
 >
 
-const data: Category[] = [
-  {
-    id: 1,
-    name: '一级课堂',
-    editable: true,
-    explanation: {
-      title: '志愿服务类学时认定说明',
-      text: '参加学院组织的勤工助学岗位、学生助理岗位并积极完成工作者，按每学期可申报 5 个学时（需勤工岗位部门认定）；在校期间参与志愿服务，志愿服务时长 2 小时计劳动实践 1 学时（志愿服务工作，按所在服务单位开具的加盖部门公章证明为参考，由院团委核定为准，10 学时封顶）。',
-    },
-    max_total_hour: 30,
-    items: [
-      {
-        id: 123,
-        description: '优秀寝室',
-        duration_hour: 6,
-        state: 'approved',
-        picture_urls: ['/1.jpg', '/2.jpg'],
-      },
-      {
-        id: 1234,
-        description: '优秀寝室',
-        duration_hour: 6,
-        state: 'rejected',
-        rejected_reason: '证据无效',
-        picture_urls: ['/3.jpg', '/4.jpg'],
-      },
-      {
-        id: 12345,
-        description: '优秀寝室',
-        duration_hour: 6,
-        state: 'pending',
-        picture_urls: ['/5.jpg', '/6.jpg'],
-      },
-      {
-        id: 123245,
-        description: '优秀寝室',
-        duration_hour: 6,
-        picture_urls: ['/7.jpg'],
-      } as any,
-    ],
-  },
-  {
-    id: 2,
-    name: '二三级课堂',
-    max_total_hour: 20,
-    editable: true,
-    items: [
-      {
-        id: 234,
-        description: 'whatever',
-        duration_hour: 6,
-        state: 'rejected',
-        picture_urls: [
-          'https://picsum.photos/400/300',
-          'https://picsum.photos/400/300',
-        ],
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: '志愿服务类',
-    explanation: {
-      title: '志愿服务类学时认定说明',
-      text: '参加学院组织的勤工助学岗位、学生助理岗位并积极完成工作者，按每学期可申报 5 个学时（需勤工岗位部门认定）；在校期间参与志愿服务，志愿服务时长 2 小时计劳动实践 1 学时（志愿服务工作，按所在服务单位开具的加盖部门公章证明为参考，由院团委核定为准，10 学时封顶）。',
-    },
-    editable: true,
-    items: [
-      {
-        id: 3,
-        description: '志愿服务类',
-        duration_hour: 6,
-        picture_urls: [
-          'https://picsum.photos/400/300',
-          'https://picsum.photos/400/300',
-        ],
-        state: 'pending',
-      },
-    ],
-  },
-  {
-    id: 5,
-    name: '社会实践类',
-    editable: true,
-    items: [
-      {
-        id: 45,
-        state: 'pending',
-        description: '社会实践类',
-        duration_hour: 6,
-        picture_urls: [
-          'https://picsum.photos/400/300',
-          'https://picsum.photos/400/300',
-        ],
-      },
-    ],
-  },
-]
-
 const ConfirmPersonalInfo = () => {
   const { confirmPersonalInfo, personalInfoConfirmed } = usePreferences(
     (state) => ({
@@ -141,6 +48,8 @@ const ConfirmPersonalInfo = () => {
     }),
     shallow
   )
+
+  const { data, error } = http.useStudent()
 
   return (
     <Modal open={!personalInfoConfirmed}>
@@ -151,7 +60,8 @@ const ConfirmPersonalInfo = () => {
             <Typography>请确认你的个人信息，如有错误请联系辅导员</Typography>
           </Stack>
 
-          <StudentInfo student={null} />
+          {data && <StudentInfo student={data} />}
+          {error && <Alert color="danger">获取个人信息失败</Alert>}
 
           <Button variant="solid" onClick={() => confirmPersonalInfo()}>
             确认
@@ -163,22 +73,25 @@ const ConfirmPersonalInfo = () => {
 }
 
 export const User = () => {
-  const [categories, setCategories] = useState(data)
-
   const [currentItemIndex, setCurrentItemIndex] = useState(0)
 
-  const [itemsActions, setItemsActions] = useState<{
-    added: Map<number, NewItem> // local id -> item
-    updated: Map<number, UpdateItem> // item id -> item
-    removedIds: Set<number>
-  }>(() => ({
-    added: new Map(),
-    updated: new Map(),
-    removedIds: new Set(),
-  }))
+  const emptyItemsActions = () =>
+    ({
+      added: new Map(),
+      updated: new Map(),
+      removedIds: new Set(),
+    } as {
+      added: Map<number, NewItem> // local id -> item
+      updated: Map<number, UpdateItem> // item id -> item
+      removedIds: Set<number>
+    })
+  const [itemsActions, setItemsActions] = useState(emptyItemsActions)
 
-  const localCategories: CategoryWithNewItem[] = useMemo(
+  const { data: categories, error, mutate } = http.useCategories()
+
+  const localCategories: CategoryWithNewItem[] | undefined = useMemo(
     () =>
+      categories &&
       produce(categories, (draft) => {
         for (const category of draft) {
           category.items = category.items
@@ -201,11 +114,54 @@ export const User = () => {
     [categories, itemsActions]
   )
 
+  if (error) {
+    return (
+      <Container
+        maxWidth="md"
+        sx={{
+          py: 2,
+        }}
+      >
+        <Alert color="danger">获取数据失败：{String(error)}</Alert>
+      </Container>
+    )
+  }
+  if (!localCategories) {
+    return null
+  }
+
   const currentCategory = localCategories[currentItemIndex]
 
-  useEffect(() => {
-    console.log(itemsActions)
-  }, [itemsActions])
+  const onSubmit = async () => {
+    const addedItems: AddItemRequest = Array.from(
+      itemsActions.added.values()
+    ).map((item) => ({
+      id: item.category_id,
+      items: [
+        {
+          description: item.description,
+          duration_hour: +item.duration_hour,
+          picture_urls: item.picture_urls,
+        },
+      ],
+    }))
+    const updatedItems: UpdateItemRequest = Array.from(
+      itemsActions.updated.values()
+    )
+    const removedIds = Array.from(itemsActions.removedIds.values())
+
+    try {
+      await http.updateItems(addedItems, updatedItems, removedIds)
+      setItemsActions(emptyItemsActions())
+      mutate()
+      toast.success('提交成功')
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        toast.error(e.response?.data.type)
+      }
+      return
+    }
+  }
 
   return (
     <Container
@@ -214,6 +170,7 @@ export const User = () => {
         py: 2,
       }}
     >
+      <Me />
       <ConfirmPersonalInfo />
 
       <Stack spacing={2}>
@@ -280,10 +237,10 @@ export const User = () => {
           </Button>
 
           <Typography color="neutral">{`${currentItemIndex + 1} / ${
-            categories.length
+            localCategories.length
           }`}</Typography>
 
-          {currentItemIndex + 1 !== categories.length ? (
+          {currentItemIndex + 1 !== localCategories.length ? (
             <Button
               endDecorator={<KeyboardArrowRight />}
               onClick={() => {
@@ -293,7 +250,11 @@ export const User = () => {
               下一页
             </Button>
           ) : (
-            <Button endDecorator={<PublishIcon />} color="success">
+            <Button
+              endDecorator={<PublishIcon />}
+              color="success"
+              onClick={onSubmit}
+            >
               提交
             </Button>
           )}

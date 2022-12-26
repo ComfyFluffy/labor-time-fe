@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
-import { Category, Student } from './model'
+import { Category, Item, Student } from './model'
 import { usePreferences } from './store'
 import useSWR from 'swr'
 
@@ -29,6 +29,15 @@ export interface SignOssResponse {
 
 export type GetStudentCategoriesResponse = Category[]
 
+export type AddItemRequest = (Pick<Category, 'id'> & {
+  items: Pick<Item, 'description' | 'duration_hour' | 'picture_urls'>[]
+})[]
+
+export type UpdateItemRequest = Pick<
+  Item,
+  'id' | 'description' | 'duration_hour' | 'picture_urls'
+>[]
+
 // Admin Only
 
 export type GetManagedClassesResponse = {
@@ -50,23 +59,43 @@ export class Http {
 
   constructor() {
     this.axios = axios.create({
-      baseURL: '/api',
+      baseURL: 'http://47.103.210.124:8080/api',
     })
     this.axios.interceptors.request.use((config) => {
+      if (config.url?.endsWith('/login')) {
+        return config
+      }
+
       const token = usePreferences.getState().token
       if (token) {
-        config.headers!.Authorization = `Bearer ${token}`
+        config.headers!.Authorization = token
       }
       return config
     })
+    this.axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          this.logout()
+        }
+        return Promise.reject(error)
+      }
+    )
   }
 
   async login(request: AuthRequest, userType: UserType): Promise<void> {
     // Global axios
     const {
       data: { token },
-    } = await axios.post<AuthResponse>(`/v1/user/${userType}/login`, request)
+    } = await this.axios.post<AuthResponse>(
+      `/v1/user/${userType}/login`,
+      request
+    )
     usePreferences.setState({ token })
+  }
+
+  logout() {
+    usePreferences.setState({ token: undefined })
   }
 
   useGet<T>(url: string, query?: Record<string, string>) {
@@ -90,11 +119,17 @@ export class Http {
     return this.useGet<Student>('/v1/student/info')
   }
 
-  async signFileUploadUrl(): Promise<SignOssResponse> {
+  private async signFileUploadUrl(): Promise<SignOssResponse> {
     const { data } = await this.axios.get<SignOssResponse>(
       '/v1/labor/student/picture'
     )
     return data
+  }
+
+  async uploadFile(file: File): Promise<string> {
+    const { upload_url, download_url } = await this.signFileUploadUrl()
+    await axios.put(upload_url, file)
+    return download_url
   }
 
   async getClasses(): Promise<GetManagedClassesResponse> {
@@ -118,6 +153,21 @@ export class Http {
         student_id: String(student_id),
       }
     )
+  }
+
+  useCategories() {
+    return this.useGet<Category[]>('/v1/labor/student')
+  }
+
+  async updateItems(
+    added: AddItemRequest,
+    updated: UpdateItemRequest,
+    deleted: number[]
+  ) {
+    const api = '/v1/labor/student'
+    await this.axios.post(api, added)
+    await this.axios.put(api, updated)
+    await this.axios.post(api + '/delete', deleted)
   }
 }
 

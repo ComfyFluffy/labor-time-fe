@@ -185,15 +185,6 @@ const NavDrawer = ({ setOpen, open, variant }: NavDrawerProps) => {
 
           <ListDivider />
 
-          <ListItem>
-            <ListItemButton>
-              <ListItemDecorator>
-                <InsightsIcon />
-              </ListItemDecorator>
-              <ListItemContent>数据概览</ListItemContent>
-            </ListItemButton>
-          </ListItem>
-
           <ListItem nested>
             <ListItemButton>
               <ListItemDecorator>
