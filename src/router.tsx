@@ -8,7 +8,7 @@ import { Admin } from './pages/Admin'
 import { ClassView } from './pages/Admin/classView'
 import { Index } from './pages/Index'
 import { Login } from './pages/Login'
-import { User } from './pages/User'
+import { Student } from './pages/Student'
 import { usePreferences } from './store'
 
 const LoginRedirect = () => {
@@ -36,7 +36,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'student',
-        element: <User />,
+        element: <Student />,
       },
       {
         path: 'admin',

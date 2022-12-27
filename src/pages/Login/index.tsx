@@ -11,7 +11,7 @@ import { Button, TextField } from '@mui/material'
 import { AxiosError } from 'axios'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { http } from '../../http'
+import { http, UserType } from '../../http'
 const Circle = ({
   size,
   color,
@@ -86,6 +86,7 @@ export const Login = () => {
   })
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [userType, setUserType] = useState<UserType>('student')
 
   const nav = useNavigate()
 
@@ -95,7 +96,7 @@ export const Login = () => {
       try {
         setSubmitting(true)
         await http.login(credentials, 'student')
-        nav('/student')
+        nav(userType === 'student' ? '/student' : '/teacher')
       } catch (err) {
         if (err instanceof AxiosError) {
           setErrorMessage(err.response?.data.type)
@@ -130,7 +131,11 @@ export const Login = () => {
         alignItems="center"
         onSubmit={handleSubmit}
       >
-        <Typography level="h3">学生劳动实践学时认定</Typography>
+        <Typography level="h3">
+          {userType === 'student'
+            ? '学生劳动实践学时认定'
+            : '学生劳动实践学时认定管理系统'}
+        </Typography>
         <Stack
           spacing={3}
           sx={{
@@ -139,7 +144,7 @@ export const Login = () => {
           }}
         >
           <TextField
-            label="学号"
+            label={userType === 'student' ? '学号' : '手机号'}
             color="primary"
             fullWidth
             required
@@ -174,8 +179,13 @@ export const Login = () => {
           sx={{
             color: 'rgb(230, 230, 100, 0.8)',
           }}
+          onClick={() =>
+            setUserType((userType) =>
+              userType === 'student' ? 'teacher' : 'student'
+            )
+          }
         >
-          管理员登录
+          {userType === 'teacher' ? '学生登录' : '管理员登录'}
         </Link>
 
         <Button
@@ -186,6 +196,7 @@ export const Login = () => {
           variant="outlined"
           color="inherit"
           size="large"
+          disabled={submitting}
         >
           登录
         </Button>

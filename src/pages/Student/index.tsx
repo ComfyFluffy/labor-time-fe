@@ -1,11 +1,8 @@
 import {
   Alert,
-  Box,
   Button,
   Container,
-  Divider,
   Modal,
-  ModalClose,
   ModalDialog,
   Stack,
   Typography,
@@ -21,14 +18,14 @@ import { usePreferences } from '../../store'
 import shallow from 'zustand/shallow'
 import { StudentInfo } from '../../components/StudentInfo'
 import { AddItemRequest, http, UpdateItemRequest } from '../../http'
-import { toast } from 'react-toastify'
-import { AxiosError } from 'axios'
 import { Me } from './Me'
 
 let itemLocalId = 0
 
-export type NewItem = Pick<Item, 'description' | 'picture_urls'> & {
-  duration_hour: number
+export type NewItem = Pick<
+  Item,
+  'description' | 'picture_urls' | 'duration_hour'
+> & {
   local_id: number
   category_id: number
 }
@@ -72,7 +69,7 @@ const ConfirmPersonalInfo = () => {
   )
 }
 
-export const User = () => {
+export const Student = () => {
   const [currentItemIndex, setCurrentItemIndex] = useState(0)
 
   const emptyItemsActions = () =>
@@ -114,53 +111,132 @@ export const User = () => {
     [categories, itemsActions]
   )
 
-  if (error) {
-    return (
-      <Container
-        maxWidth="md"
-        sx={{
-          py: 2,
-        }}
-      >
-        <Alert color="danger">获取数据失败：{String(error)}</Alert>
-      </Container>
-    )
-  }
-  if (!localCategories) {
-    return null
-  }
+  const onSubmit = () => {
+    http.toast(async () => {
+      const addedItems: AddItemRequest = Array.from(
+        itemsActions.added.values()
+      ).map((item) => ({
+        id: item.category_id,
+        items: [
+          {
+            description: item.description,
+            duration_hour: +item.duration_hour,
+            picture_urls: item.picture_urls,
+          },
+        ],
+      }))
+      const updatedItems: UpdateItemRequest = Array.from(
+        itemsActions.updated.values()
+      ).map((item) => ({
+        id: item.id,
+        description: item.description,
+        duration_hour: +item.duration_hour,
+        picture_urls: item.picture_urls,
+      }))
+      const removedIds = Array.from(itemsActions.removedIds.values())
 
-  const currentCategory = localCategories[currentItemIndex]
-
-  const onSubmit = async () => {
-    const addedItems: AddItemRequest = Array.from(
-      itemsActions.added.values()
-    ).map((item) => ({
-      id: item.category_id,
-      items: [
-        {
-          description: item.description,
-          duration_hour: +item.duration_hour,
-          picture_urls: item.picture_urls,
-        },
-      ],
-    }))
-    const updatedItems: UpdateItemRequest = Array.from(
-      itemsActions.updated.values()
-    )
-    const removedIds = Array.from(itemsActions.removedIds.values())
-
-    try {
       await http.updateItems(addedItems, updatedItems, removedIds)
       setItemsActions(emptyItemsActions())
       mutate()
-      toast.success('提交成功')
-    } catch (e) {
-      if (e instanceof AxiosError) {
-        toast.error(e.response?.data.type)
-      }
-      return
-    }
+    })
+  }
+
+  let content = null
+
+  if (localCategories) {
+    const currentCategory = localCategories[currentItemIndex]
+    content = (
+      <>
+        <ConfirmPersonalInfo />
+        <Stack spacing={2}>
+          <Typography level="h4">学生劳动实践学时认定</Typography>
+
+          <Editor
+            category={currentCategory}
+            onRemoveItem={(item) => {
+              if ('id' in item) {
+                setItemsActions((actions) =>
+                  produce(actions, (draft) => {
+                    draft.removedIds.add(item.id)
+                  })
+                )
+              } else if ('local_id' in item) {
+                setItemsActions((actions) =>
+                  produce(actions, (draft) => {
+                    draft.added.delete(item.local_id)
+                  })
+                )
+              }
+            }}
+            onAddItem={() => {
+              setItemsActions((actions) =>
+                produce(actions, (draft) => {
+                  const newItem: NewItem = {
+                    category_id: currentCategory.id,
+                    description: '',
+                    duration_hour: '',
+                    picture_urls: [],
+                    local_id: itemLocalId++,
+                  }
+                  draft.added.set(newItem.local_id, newItem)
+                })
+              )
+            }}
+            onUpdateItem={(item) => {
+              setItemsActions((actions) =>
+                produce(actions, (draft) => {
+                  if ('id' in item) {
+                    draft.updated.set(item.id, item)
+                  } else if ('local_id' in item) {
+                    draft.added.set(item.local_id, item)
+                  }
+                })
+              )
+            }}
+          />
+
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Button
+              startDecorator={<KeyboardArrowLeft />}
+              variant="soft"
+              onClick={() => {
+                setCurrentItemIndex((index) => index - 1)
+              }}
+              disabled={currentItemIndex === 0}
+            >
+              上一页
+            </Button>
+
+            <Typography color="neutral">{`${currentItemIndex + 1} / ${
+              localCategories.length
+            }`}</Typography>
+
+            {currentItemIndex + 1 !== localCategories.length ? (
+              <Button
+                endDecorator={<KeyboardArrowRight />}
+                onClick={() => {
+                  setCurrentItemIndex((index) => index + 1)
+                }}
+              >
+                下一页
+              </Button>
+            ) : (
+              <Button
+                endDecorator={<PublishIcon />}
+                color="success"
+                onClick={onSubmit}
+              >
+                提交
+              </Button>
+            )}
+          </Stack>
+        </Stack>
+      </>
+    )
   }
 
   return (
@@ -171,95 +247,8 @@ export const User = () => {
       }}
     >
       <Me />
-      <ConfirmPersonalInfo />
-
-      <Stack spacing={2}>
-        <Typography level="h4">学生劳动实践学时认定</Typography>
-
-        <Editor
-          category={currentCategory}
-          onRemoveItem={(item) => {
-            if ('id' in item) {
-              setItemsActions((actions) =>
-                produce(actions, (draft) => {
-                  draft.removedIds.add(item.id)
-                })
-              )
-            } else if ('local_id' in item) {
-              setItemsActions((actions) =>
-                produce(actions, (draft) => {
-                  draft.added.delete(item.local_id)
-                })
-              )
-            }
-          }}
-          onAddItem={() => {
-            setItemsActions((actions) =>
-              produce(actions, (draft) => {
-                const newItem: NewItem = {
-                  category_id: currentCategory.id,
-                  description: '',
-                  duration_hour: '' as any,
-                  picture_urls: [],
-                  local_id: itemLocalId++,
-                }
-                draft.added.set(newItem.local_id, newItem)
-              })
-            )
-          }}
-          onUpdateItem={(item) => {
-            setItemsActions((actions) =>
-              produce(actions, (draft) => {
-                if ('id' in item) {
-                  draft.updated.set(item.id, item)
-                } else if ('local_id' in item) {
-                  draft.added.set(item.local_id, item)
-                }
-              })
-            )
-          }}
-        />
-
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Button
-            startDecorator={<KeyboardArrowLeft />}
-            variant="soft"
-            onClick={() => {
-              setCurrentItemIndex((index) => index - 1)
-            }}
-            disabled={currentItemIndex === 0}
-          >
-            上一页
-          </Button>
-
-          <Typography color="neutral">{`${currentItemIndex + 1} / ${
-            localCategories.length
-          }`}</Typography>
-
-          {currentItemIndex + 1 !== localCategories.length ? (
-            <Button
-              endDecorator={<KeyboardArrowRight />}
-              onClick={() => {
-                setCurrentItemIndex((index) => index + 1)
-              }}
-            >
-              下一页
-            </Button>
-          ) : (
-            <Button
-              endDecorator={<PublishIcon />}
-              color="success"
-              onClick={onSubmit}
-            >
-              提交
-            </Button>
-          )}
-        </Stack>
-      </Stack>
+      {error && <Alert color="danger">获取数据失败：{String(error)}</Alert>}
+      {content}
     </Container>
   )
 }

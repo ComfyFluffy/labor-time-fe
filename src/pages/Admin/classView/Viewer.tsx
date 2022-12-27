@@ -12,7 +12,7 @@ import {
 } from '@mui/joy'
 import { useMediaQuery } from '@mui/material'
 import { Student } from '../../../model'
-import { ItemEditor } from '../../User/Editor'
+import { ItemEditor } from '../../Student/Editor'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 import UndoIcon from '@mui/icons-material/Undo'

@@ -5,7 +5,7 @@ export interface Item {
   state: ItemState
   rejected_reason?: string
   description: string
-  duration_hour: number
+  duration_hour: string | number
   picture_urls: string[]
 }
 

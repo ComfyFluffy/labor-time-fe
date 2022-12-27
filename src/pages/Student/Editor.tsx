@@ -33,7 +33,6 @@ import { CategoryWithNewItem, NewItem } from '.'
 import { ReactNode, useMemo, useState } from 'react'
 import ImageViewer from 'react-simple-image-viewer'
 import { http } from '../../http'
-import { toast, useToast } from 'react-toastify'
 
 const transparentBackground = (theme: Theme) =>
   theme.palette.mode === 'dark'
@@ -357,7 +356,7 @@ export const ItemEditor = ({
             onChange &&
             onChange({
               ...item,
-              duration_hour: e.target.value as any, // TODO: use a form validation library
+              duration_hour: e.target.value, // TODO: use a form validation library
             })
           }
         />
@@ -385,18 +384,14 @@ export const ItemEditor = ({
             <Grid xs={1}>
               <UploadButton
                 onUpload={(file) => {
-                  ;(async () => {
-                    try {
-                      const url = await http.uploadFile(file)
-                      onChange &&
-                        onChange({
-                          ...item,
-                          picture_urls: [...(item.picture_urls || []), url],
-                        })
-                    } catch (error) {
-                      toast.error('上传失败：' + String(error))
-                    }
-                  })()
+                  http.toast(async () => {
+                    const url = await http.uploadImage(file)
+                    onChange &&
+                      onChange({
+                        ...item,
+                        picture_urls: [...(item.picture_urls || []), url],
+                      })
+                  })
                 }}
               />
             </Grid>

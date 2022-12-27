@@ -1,7 +1,9 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosError, AxiosInstance } from 'axios'
 import { Category, Item, Student } from './model'
 import { usePreferences } from './store'
 import useSWR from 'swr'
+import { toast } from 'react-toastify'
+import imageCompression from 'browser-image-compression'
 
 export type UserType = 'student' | 'teacher'
 
@@ -30,13 +32,17 @@ export interface SignOssResponse {
 export type GetStudentCategoriesResponse = Category[]
 
 export type AddItemRequest = (Pick<Category, 'id'> & {
-  items: Pick<Item, 'description' | 'duration_hour' | 'picture_urls'>[]
+  items: (Pick<Item, 'description' | 'picture_urls'> & {
+    duration_hour: number
+  })[]
 })[]
 
-export type UpdateItemRequest = Pick<
+export type UpdateItemRequest = (Pick<
   Item,
-  'id' | 'description' | 'duration_hour' | 'picture_urls'
->[]
+  'id' | 'description' | 'picture_urls'
+> & {
+  duration_hour: number
+})[]
 
 // Admin Only
 
@@ -53,6 +59,11 @@ export type RejectStudentItemRequest = {
   item_id: number
   reason?: string
 }
+
+export type ApiError = AxiosError<{
+  code: number
+  type: string
+}>
 
 export class Http {
   axios: AxiosInstance
@@ -126,9 +137,18 @@ export class Http {
     return data
   }
 
-  async uploadFile(file: File): Promise<string> {
+  async uploadImage(file: File): Promise<string> {
+    const compressedFile = await imageCompression(file, {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    })
     const { upload_url, download_url } = await this.signFileUploadUrl()
-    await axios.put(upload_url, file)
+    await axios.put(upload_url, compressedFile, {
+      headers: {
+        'Content-Type': '', // Empty string to remove default header to satisfy OSS
+      },
+    })
     return download_url
   }
 
@@ -165,9 +185,27 @@ export class Http {
     deleted: number[]
   ) {
     const api = '/v1/labor/student'
-    await this.axios.post(api, added)
-    await this.axios.put(api, updated)
-    await this.axios.post(api + '/delete', deleted)
+    added.length && (await this.axios.post(api, added))
+    updated.length && (await this.axios.put(api, updated))
+    deleted.length && (await this.axios.post(api + '/delete', deleted))
+  }
+
+  toast<T>(promise: Promise<T> | (() => Promise<T>)) {
+    toast.promise(promise, {
+      pending: '正在提交',
+      success: '提交成功',
+      error: {
+        render: ({ data }) => {
+          if (data instanceof AxiosError && data.response) {
+            return '提交错误：' + (data.response.data.type || data.message)
+          }
+          if (data instanceof Error) {
+            return '提交错误：' + data.message
+          }
+          return '提交错误'
+        },
+      },
+    })
   }
 }
 
