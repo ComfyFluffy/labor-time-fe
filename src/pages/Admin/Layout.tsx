@@ -4,6 +4,7 @@ import {
   Button,
   Chip,
   Container,
+  Divider,
   IconButton,
   IconButtonProps,
   List,
@@ -29,15 +30,22 @@ import {
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useEffect, useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useMatch, useNavigate } from 'react-router-dom'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import GroupsIcon from '@mui/icons-material/Groups'
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 import ImportExportIcon from '@mui/icons-material/ImportExport'
 import { http } from '../../http'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
+import { SxProps } from '@mui/joy/styles/types'
 
-const drawerWidth = 0o400
+const drawerWidth = 0o420
+
+const barBorderStyles: SxProps = (theme) => ({
+  borderColor: theme.vars.palette.neutral.outlinedBorder,
+  borderWidth: '0px 0px thin',
+  borderStyle: 'solid',
+})
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean
@@ -125,9 +133,6 @@ const NavBar = ({
       sx={(theme) => ({
         height: 0o100,
         px: 2,
-        borderColor: theme.vars.palette.neutral.outlinedBorder,
-        borderWidth: '0px 0px thin',
-        borderStyle: 'solid',
         backdropFilter: 'blur(8px)',
         position: 'sticky',
         top: 0,
@@ -138,6 +143,7 @@ const NavBar = ({
         [theme.getColorSchemeSelector('dark')]: {
           backgroundColor: `rgba(${theme.vars.palette.neutral.darkChannel} / 0.8)`,
         },
+        ...barBorderStyles(theme),
       })}
     >
       {noMenuTransition ? (
@@ -171,6 +177,9 @@ const NavDrawerList = () => {
   const [classListOpen, setClassListOpen] = useState(true)
   const { data: teacherData, error: teacherError } = http.useTeacherInfo()
   const { data: classesData, error: classesError } = http.useTeacherClasses()
+  const nav = useNavigate()
+
+  const classRouteMatch = useMatch('/admin/class/:classId')
 
   return (
     <List
@@ -238,11 +247,21 @@ const NavDrawerList = () => {
                 },
               }}
             >
-              {classesData.map((item) => (
-                <ListItem key={item.id}>
-                  <ListItemButton>{item.name}</ListItemButton>
-                </ListItem>
-              ))}
+              {classesData.map((item) => {
+                const match =
+                  classRouteMatch?.params.classId === String(item.id)
+                return (
+                  <ListItem key={item.id}>
+                    <ListItemButton
+                      selected={match}
+                      variant={match ? 'soft' : undefined}
+                      onClick={() => nav(`/admin/class/${item.id}`)}
+                    >
+                      {item.name}
+                    </ListItemButton>
+                  </ListItem>
+                )
+              })}
               {!classesData.length && (
                 <ListItem>
                   <ListItemButton disabled>暂无班级</ListItemButton>
@@ -310,10 +329,15 @@ const NavDrawer = ({ setOpen, open, variant }: NavDrawerProps) => {
         <Stack
           direction="row"
           alignItems="center"
-          sx={{
+          sx={(theme) => ({
             height: 0o100,
             px: 2,
-          }}
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
+            background: theme.vars.palette.background.body,
+            ...barBorderStyles(theme),
+          })}
         >
           <IconButton variant="plain" onClick={() => setOpen(!open)}>
             <MenuIcon />

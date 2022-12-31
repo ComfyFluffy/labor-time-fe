@@ -237,10 +237,10 @@ export const ItemEditor = ({
     rejected: {
       color: 'danger',
       Icon: ErrorIcon,
-      title: '此项目被打回，请修改后重新提交或移除此项目',
+      title:
+        '此项目被打回' + (editable ? '，请修改后重新提交或移除此项目' : ''),
       reason:
-        ('rejected_reason' in item && '原因：' + item.rejected_reason) ||
-        undefined,
+        ('reject_reason' in item && '原因：' + item.reject_reason) || undefined,
     },
     ...(viewMode
       ? undefined

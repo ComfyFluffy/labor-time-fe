@@ -4,6 +4,15 @@ import { extendTheme as extendJoyTheme } from '@mui/joy/styles'
 
 const joyTheme = extendJoyTheme()
 
-const muiTheme = extendMuiTheme()
+const muiTheme = extendMuiTheme({
+  // Disable ripple effect
+  components: {
+    MuiButtonBase: {
+      defaultProps: {
+        disableRipple: true,
+      },
+    },
+  },
+})
 
 export const theme = deepmerge(muiTheme, joyTheme)

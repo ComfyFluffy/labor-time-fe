@@ -129,7 +129,7 @@ export class Http {
     await this.axios.post(`/v1/user/${userType}/password`, request)
   }
 
-  useStudent() {
+  useStudentSelf() {
     return this.useGet<Student>('/v1/student/info')
   }
 
@@ -155,9 +155,9 @@ export class Http {
     return download_url
   }
 
-  useStudentCategories(student_id: number | string) {
+  useStudentCategories(studentId: string) {
     return this.useGet<GetStudentCategoriesResponse>(`/v1/labor/teacher`, {
-      student_id: String(student_id),
+      student_id: studentId,
     })
   }
 
@@ -190,16 +190,16 @@ export class Http {
     )
   }
 
-  useClassStudents(class_id: number) {
+  useClassStudents(classId: number) {
     return this.useGet<Student[]>(`/v1/teacher/student`, {
-      class_id: String(class_id),
+      class_id: String(classId),
     })
   }
 
-  async rejectItem(id: number, rejected_reason: string) {
+  async rejectItem(id: number, rejectedReason: string) {
     await this.axios.post('/v1/labor/teacher/reject', {
       id,
-      rejected_reason,
+      reject_reason: rejectedReason,
     })
   }
 

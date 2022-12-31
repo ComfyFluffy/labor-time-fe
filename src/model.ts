@@ -3,7 +3,7 @@ export type ItemState = 'pending' | 'approved' | 'rejected'
 export interface Item {
   id: number
   state: ItemState
-  rejected_reason?: string
+  reject_reason?: string
   description: string
   duration_hour: string | number
   picture_urls: string[]

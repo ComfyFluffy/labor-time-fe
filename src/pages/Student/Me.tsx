@@ -2,7 +2,7 @@ import { Button, Stack, Typography } from '@mui/joy'
 import { http } from '../../http'
 
 export const Me = () => {
-  const { data } = http.useStudent()
+  const { data } = http.useStudentSelf()
 
   return (
     <Stack direction="row" justifyContent="end" alignItems="center" spacing={2}>

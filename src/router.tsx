@@ -5,7 +5,7 @@ import {
   useMatch,
 } from 'react-router-dom'
 import { Admin } from './pages/Admin'
-import { ClassView } from './pages/Admin/classView'
+import { ClassPage } from './pages/Admin/class'
 import { Index } from './pages/Index'
 import { Login } from './pages/Login'
 import { Student } from './pages/Student'
@@ -51,8 +51,8 @@ export const router = createBrowserRouter([
             element: <div>ww</div>,
           },
           {
-            path: 'classView/:classId',
-            element: <ClassView />,
+            path: 'class/:classId',
+            element: <ClassPage />,
           },
         ],
       },

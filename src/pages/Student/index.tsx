@@ -46,7 +46,7 @@ const ConfirmPersonalInfo = () => {
     shallow
   )
 
-  const { data, error } = http.useStudent()
+  const { data, error } = http.useStudentSelf()
 
   return (
     <Modal open={!personalInfoConfirmed}>

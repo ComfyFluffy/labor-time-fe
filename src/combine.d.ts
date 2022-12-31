@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // https://mui.com/joy-ui/guides/using-joy-ui-and-material-ui-together/#typescript-setup
 
 import type {} from '@mui/material/themeCssVarsAugmentation'
