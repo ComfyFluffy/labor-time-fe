@@ -391,7 +391,7 @@ export const ItemEditor = ({
                         ...item,
                         picture_urls: [...(item.picture_urls || []), url],
                       })
-                  })
+                  }, '上传图片')
                 }}
               />
             </Grid>

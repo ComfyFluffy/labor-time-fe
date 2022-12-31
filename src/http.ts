@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance } from 'axios'
-import { Category, Item, Student } from './model'
+import { Teacher, Category, Class, Item, Student } from './model'
 import { usePreferences } from './store'
 import useSWR from 'swr'
 import { toast } from 'react-toastify'
@@ -65,6 +65,10 @@ export type ApiError = AxiosError<{
   type: string
 }>
 
+export type TeacherInfoResponse = Teacher & {
+  classes: Class[]
+}
+
 export class Http {
   axios: AxiosInstance
 
@@ -95,7 +99,6 @@ export class Http {
   }
 
   async login(request: AuthRequest, userType: UserType): Promise<void> {
-    // Global axios
     const {
       data: { token },
     } = await this.axios.post<AuthResponse>(
@@ -152,27 +155,10 @@ export class Http {
     return download_url
   }
 
-  async getClasses(): Promise<GetManagedClassesResponse> {
-    const { data } = await this.axios.get<GetManagedClassesResponse>(
-      '/v1/admin/class'
-    )
-    return data
-  }
-
-  async getSudentsInClass(id: number): Promise<GetStudentsInClassResponse> {
-    const { data } = await this.axios.get<GetStudentsInClassResponse>(
-      `/v1/admin/class/${id}/student`
-    )
-    return data
-  }
-
   useStudentCategories(student_id: number | string) {
-    return this.useGet<GetStudentCategoriesResponse>(
-      `/v1/labor/student/category`,
-      {
-        student_id: String(student_id),
-      }
-    )
+    return this.useGet<GetStudentCategoriesResponse>(`/v1/labor/teacher`, {
+      student_id: String(student_id),
+    })
   }
 
   useCategories() {
@@ -190,19 +176,50 @@ export class Http {
     deleted.length && (await this.axios.post(api + '/delete', deleted))
   }
 
-  toast<T>(promise: Promise<T> | (() => Promise<T>)) {
+  useTeacherInfo() {
+    return this.useGet<TeacherInfoResponse>('/v1/teacher/info/self')
+  }
+
+  useTeacherClasses(schoolYear?: string) {
+    return this.useGet<Class[]>(
+      '/v1/teacher/class',
+      (schoolYear && {
+        'school-year': schoolYear,
+      }) ||
+        undefined
+    )
+  }
+
+  useClassStudents(class_id: number) {
+    return this.useGet<Student[]>(`/v1/teacher/student`, {
+      class_id: String(class_id),
+    })
+  }
+
+  async rejectItem(id: number, rejected_reason: string) {
+    await this.axios.post('/v1/labor/teacher/reject', {
+      id,
+      rejected_reason,
+    })
+  }
+
+  async passItem(id: number) {
+    await this.axios.post('/v1/labor/teacher/pass', [id])
+  }
+
+  toast<T>(promise: Promise<T> | (() => Promise<T>), text = '提交') {
     toast.promise(promise, {
-      pending: '正在提交',
-      success: '提交成功',
+      pending: '正在' + text + '…',
+      success: text + '成功',
       error: {
         render: ({ data }) => {
           if (data instanceof AxiosError && data.response) {
-            return '提交错误：' + (data.response.data.type || data.message)
+            return text + '错误：' + (data.response.data.type || data.message)
           }
           if (data instanceof Error) {
-            return '提交错误：' + data.message
+            return text + '错误：' + data.message
           }
-          return '提交错误'
+          return text + '错误'
         },
       },
     })

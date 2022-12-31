@@ -57,8 +57,8 @@ const ConfirmPersonalInfo = () => {
             <Typography>请确认你的个人信息，如有错误请联系辅导员</Typography>
           </Stack>
 
-          {data && <StudentInfo student={data} />}
           {error && <Alert color="danger">获取个人信息失败</Alert>}
+          {data && <StudentInfo student={data} />}
 
           <Button variant="solid" onClick={() => confirmPersonalInfo()}>
             确认
@@ -247,7 +247,11 @@ export const Student = () => {
       }}
     >
       <Me />
-      {error && <Alert color="danger">获取数据失败：{String(error)}</Alert>}
+      {error && (
+        <Alert color="danger" sx={{ my: 2 }}>
+          获取数据失败：{String(error)}
+        </Alert>
+      )}
       {content}
     </Container>
   )

@@ -95,11 +95,14 @@ export const Login = () => {
     ;(async () => {
       try {
         setSubmitting(true)
-        await http.login(credentials, 'student')
-        nav(userType === 'student' ? '/student' : '/teacher')
+
+        await http.login(credentials, userType)
+        nav(userType === 'student' ? '/student' : '/admin')
       } catch (err) {
         if (err instanceof AxiosError) {
-          setErrorMessage(err.response?.data.type)
+          setErrorMessage(err.response?.data.type || err.message)
+        } else if (err instanceof Error) {
+          setErrorMessage(err.message)
         }
       } finally {
         setSubmitting(false)
@@ -161,6 +164,7 @@ export const Login = () => {
             type="password"
             label="密码"
             color="primary"
+            autoComplete="current-password"
             fullWidth
             required
             value={credentials.password}

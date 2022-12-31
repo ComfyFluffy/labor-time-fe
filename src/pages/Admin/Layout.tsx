@@ -1,5 +1,7 @@
 import {
+  Alert,
   Box,
+  Button,
   Chip,
   Container,
   IconButton,
@@ -11,12 +13,15 @@ import {
   listItemButtonClasses,
   ListItemContent,
   ListItemDecorator,
+  Menu,
+  MenuItem,
   Stack,
   Typography,
 } from '@mui/joy'
 import {
   Collapse,
   Drawer,
+  drawerClasses,
   DrawerProps,
   styled,
   useMediaQuery,
@@ -27,9 +32,10 @@ import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import GroupsIcon from '@mui/icons-material/Groups'
-import InsightsIcon from '@mui/icons-material/Insights'
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 import ImportExportIcon from '@mui/icons-material/ImportExport'
+import { http } from '../../http'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 
 const drawerWidth = 0o400
 
@@ -58,6 +64,45 @@ interface NavBarProps {
   noMenuTransition?: boolean
 }
 
+const SchoolYearSwitcher = () => {
+  const years = ['2021-2022']
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  return (
+    <>
+      <Button
+        endDecorator={<ArrowDropDownIcon />}
+        variant="soft"
+        onClick={(event) => {
+          setAnchorEl(event.currentTarget)
+        }}
+      >
+        {years[selectedIndex] + ' 学年'}
+      </Button>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => {
+          setAnchorEl(null)
+        }}
+      >
+        {years.map((year, index) => (
+          <MenuItem
+            key={year}
+            selected={index === selectedIndex}
+            onClick={() => {
+              setSelectedIndex(index)
+              setAnchorEl(null)
+            }}
+          >
+            {year}
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
+  )
+}
+
 const NavBar = ({
   onMenuClick,
   showMenuButton,
@@ -70,6 +115,7 @@ const NavBar = ({
   )
 
   const theme = useTheme()
+  const { data } = http.useTeacherInfo()
 
   return (
     <Stack
@@ -109,12 +155,127 @@ const NavBar = ({
         </Collapse>
       )}
 
-      <Typography level="h6">管理后台</Typography>
+      <SchoolYearSwitcher />
       <Box sx={{ flexGrow: 1 }} />
-      <Stack direction="row" spacing={1}></Stack>
+      <Stack direction="row" alignItems="center" spacing={1}>
+        {data && <Typography color="neutral">{data.name}</Typography>}
+        <Button onClick={() => http.logout()} variant="soft" color="neutral">
+          登出
+        </Button>
+      </Stack>
     </Stack>
   )
 }
+
+const NavDrawerList = () => {
+  const [classListOpen, setClassListOpen] = useState(true)
+  const { data: teacherData, error: teacherError } = http.useTeacherInfo()
+  const { data: classesData, error: classesError } = http.useTeacherClasses()
+
+  return (
+    <List
+      sx={{
+        fontWeight: '500',
+        userSelect: 'none',
+      }}
+    >
+      {(teacherError || classesError) && (
+        <Alert
+          color="danger"
+          sx={{
+            mx: 1,
+          }}
+        >
+          获取用户信息失败
+        </Alert>
+      )}
+
+      {teacherData && (
+        <ListItem>
+          <ListItemButton>
+            <Stack
+              sx={{
+                pl: 2,
+              }}
+              spacing={1}
+              alignItems="start"
+            >
+              <Stack direction="row" alignItems="baseline" spacing={1}>
+                <Typography fontSize="xl">{teacherData.name}</Typography>
+                <Typography fontSize="xs">{teacherData.phone}</Typography>
+              </Stack>
+              <Chip size="sm">{teacherData.is_admin ? '管理员' : '教师'}</Chip>
+            </Stack>
+          </ListItemButton>
+        </ListItem>
+      )}
+
+      <ListDivider />
+
+      <ListItem nested>
+        <ListItemButton onClick={() => setClassListOpen(!classListOpen)}>
+          <ListItemDecorator>
+            <GroupsIcon />
+          </ListItemDecorator>
+          <ListItemContent>班级列表</ListItemContent>
+          <KeyboardArrowRightIcon
+            sx={{
+              transform: classListOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+              transition: 'transform 0.3s',
+            }}
+          />
+        </ListItemButton>
+
+        <Collapse in={classListOpen}>
+          {classesData && (
+            <List
+              sx={{
+                [`& .${listItemButtonClasses.root}`]: {
+                  pl: 7,
+                },
+                [`& .${listItemButtonClasses.selected}`]: {
+                  fontWeight: 'inherit',
+                },
+              }}
+            >
+              {classesData.map((item) => (
+                <ListItem key={item.id}>
+                  <ListItemButton>{item.name}</ListItemButton>
+                </ListItem>
+              ))}
+              {!classesData.length && (
+                <ListItem>
+                  <ListItemButton disabled>暂无班级</ListItemButton>
+                </ListItem>
+              )}
+            </List>
+          )}
+        </Collapse>
+      </ListItem>
+
+      <ListDivider />
+
+      <ListItem>
+        <ListItemButton>
+          <ListItemDecorator>
+            <SupervisorAccountIcon />
+          </ListItemDecorator>
+          <ListItemContent>用户管理</ListItemContent>
+        </ListItemButton>
+      </ListItem>
+
+      <ListItem>
+        <ListItemButton>
+          <ListItemDecorator>
+            <ImportExportIcon />
+          </ListItemDecorator>
+          <ListItemContent>数据导入 / 导出</ListItemContent>
+        </ListItemButton>
+      </ListItem>
+    </List>
+  )
+}
+
 interface NavDrawerProps {
   open?: boolean
   setOpen: (open: boolean) => void
@@ -135,7 +296,7 @@ const NavDrawer = ({ setOpen, open, variant }: NavDrawerProps) => {
       sx={{
         width: drawerWidth,
         flexShrink: 0,
-        '& .MuiDrawer-paper': {
+        [`& .${drawerClasses.paper}`]: {
           width: drawerWidth,
           boxSizing: 'border-box',
         },
@@ -159,82 +320,7 @@ const NavDrawer = ({ setOpen, open, variant }: NavDrawerProps) => {
           </IconButton>
         </Stack>
 
-        <List
-          sx={{
-            fontWeight: '500',
-            userSelect: 'none',
-          }}
-        >
-          <ListItem>
-            <ListItemButton>
-              <Stack
-                sx={{
-                  pl: 2,
-                }}
-                spacing={1}
-                alignItems="start"
-              >
-                <Stack direction="row" alignItems="baseline" spacing={1}>
-                  <Typography fontSize="xl">黄安</Typography>
-                  <Typography fontSize="xs">12345678890</Typography>
-                </Stack>
-                <Chip size="sm">院级管理员</Chip>
-              </Stack>
-            </ListItemButton>
-          </ListItem>
-
-          <ListDivider />
-
-          <ListItem nested>
-            <ListItemButton>
-              <ListItemDecorator>
-                <GroupsIcon />
-              </ListItemDecorator>
-              <ListItemContent>班级列表</ListItemContent>
-              <KeyboardArrowRightIcon />
-            </ListItemButton>
-
-            <Collapse in>
-              <List
-                sx={{
-                  [`& .${listItemButtonClasses.root}`]: {
-                    pl: 7,
-                  },
-                  [`& .${listItemButtonClasses.selected}`]: {
-                    fontWeight: 'inherit',
-                  },
-                }}
-              >
-                <ListItem>
-                  <ListItemButton>计算机 II 类 2114 班</ListItemButton>
-                </ListItem>
-                <ListItem>
-                  <ListItemButton selected>计算机 II 类 2115 班</ListItemButton>
-                </ListItem>
-              </List>
-            </Collapse>
-          </ListItem>
-
-          <ListDivider />
-
-          <ListItem>
-            <ListItemButton>
-              <ListItemDecorator>
-                <SupervisorAccountIcon />
-              </ListItemDecorator>
-              <ListItemContent>用户管理</ListItemContent>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem>
-            <ListItemButton>
-              <ListItemDecorator>
-                <ImportExportIcon />
-              </ListItemDecorator>
-              <ListItemContent>数据导入 / 导出</ListItemContent>
-            </ListItemButton>
-          </ListItem>
-        </List>
+        <NavDrawerList />
       </Stack>
     </Drawer>
   )

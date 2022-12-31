@@ -32,8 +32,14 @@ export interface Student {
   total_hours: number
 }
 
-export interface Admin {
+export interface Teacher {
   id: number
   name: string
   phone: string
+  is_admin: boolean
+}
+
+export interface Class {
+  id: number
+  name: string
 }
