@@ -74,7 +74,7 @@ export class Http {
 
   constructor() {
     this.axios = axios.create({
-      baseURL: 'http://47.103.210.124:8080/api',
+      baseURL: '/api',
     })
     this.axios.interceptors.request.use((config) => {
       if (config.url?.endsWith('/login')) {
