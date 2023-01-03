@@ -28,7 +28,6 @@ export interface Student {
   name: string
   class_name: string
   major: string
-  dormitory: string
   total_hours: number
 }
 

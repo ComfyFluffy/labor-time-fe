@@ -49,7 +49,6 @@ const Class = ({ classId }: { classId: number }) => {
                   headerName: '总有效时长',
                   width: 0o150,
                 },
-                { field: 'dormitory', headerName: '寝室号', width: 0o150 },
                 { field: 'state', headerName: '当前状态', width: 0o150 },
               ]}
               pageSize={50}
