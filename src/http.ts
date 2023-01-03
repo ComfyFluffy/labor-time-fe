@@ -207,6 +207,13 @@ export class Http {
     await this.axios.post('/v1/labor/teacher/pass', [id])
   }
 
+  async setItemPending(id: number) {
+    await this.axios.post(
+      '/v1/labor/teacher/rollback?' +
+        String(new URLSearchParams({ id: String(id) }))
+    )
+  }
+
   toast<T>(promise: Promise<T> | (() => Promise<T>), text = '提交') {
     toast.promise(promise, {
       pending: '正在' + text + '…',

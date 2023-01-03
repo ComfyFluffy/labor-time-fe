@@ -172,8 +172,12 @@ export const Viewer = ({
                               item.state === 'rejected') && (
                               <Button
                                 startDecorator={<UndoIcon />}
-                                color="neutral"
+                                color="warning"
                                 variant="soft"
+                                onClick={async () => {
+                                  await http.setItemPending(item.id)
+                                  mutate()
+                                }}
                               >
                                 撤销
                                 {item.state === 'approved' ? '通过' : '打回'}
