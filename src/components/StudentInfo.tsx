@@ -8,15 +8,9 @@ export const StudentInfo = ({ student }: { student: Student }) => {
         <Typography color="neutral">学号</Typography>
         <Typography color="neutral">姓名</Typography>
         <Typography color="neutral">班级</Typography>
-        <Typography color="neutral">寝室</Typography>
       </Stack>
       <Stack>
-        {[
-          student.student_id,
-          student.name,
-          student.class_name,
-          student.dormitory,
-        ].map((v, i) => (
+        {[student.student_id, student.name, student.class_name].map((v, i) => (
           <Typography key={i}>{v}</Typography>
         ))}
       </Stack>
