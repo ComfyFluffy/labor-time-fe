@@ -1,4 +1,9 @@
 export type ItemState = 'pending' | 'approved' | 'rejected'
+export type StudentState =
+  | 'allApproved'
+  | 'hasPendingItem'
+  | 'hasRejectedItem'
+  | 'notSubmitted'
 
 export interface Item {
   id: number
