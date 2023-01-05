@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom'
 import { Admin } from './pages/Admin'
 import { ClassPage } from './pages/Admin/class'
+import UserManage from './pages/Admin/userManage'
 import { Index } from './pages/Index'
 import { Login } from './pages/Login'
 import { Student } from './pages/Student'
@@ -53,6 +54,14 @@ export const router = createBrowserRouter([
           {
             path: 'class/:classId',
             element: <ClassPage />,
+          },
+          {
+            path: 'userManage',
+            element: <UserManage />,
+          },
+          {
+            path: 'dataManage',
+            element: <div>dataManage</div>,
           },
         ],
       },

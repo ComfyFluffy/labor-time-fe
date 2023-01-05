@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance } from 'axios'
-import { Teacher, Category, Class, Item, Student } from './model'
+import { Teacher, Category, Class, Item, Student, StudentState } from './model'
 import { usePreferences } from './store'
 import useSWR from 'swr'
 import { toast } from 'react-toastify'
@@ -28,8 +28,6 @@ export interface SignOssResponse {
   download_url: string
   expire_seconds: number
 }
-
-export type GetStudentCategoriesResponse = Category[]
 
 export type AddItemRequest = (Pick<Category, 'id'> & {
   items: (Pick<Item, 'description' | 'picture_urls'> & {
@@ -69,6 +67,10 @@ export type TeacherInfoResponse = Teacher & {
   classes: Class[]
 }
 
+export type TeacherClassesResponse = (Teacher & {
+  classes: Class[]
+})[]
+
 export class Http {
   axios: AxiosInstance
 
@@ -105,18 +107,25 @@ export class Http {
       `/v1/user/${userType}/login`,
       request
     )
-    usePreferences.setState({ token })
+    usePreferences.getState().login(token, userType)
   }
 
   logout() {
-    usePreferences.setState({ token: undefined })
+    usePreferences.getState().logout()
   }
 
-  useGet<T>(url: string, query?: Record<string, string>) {
+  useGet<T>(url: string, query?: Record<string, string | undefined>) {
+    const filteredQuery =
+      query &&
+      (Object.fromEntries(
+        Object.entries(query).filter(([, value]) => value !== undefined)
+      ) as Record<string, string>)
+
     return useSWR(
-      [url, query ? `?${String(new URLSearchParams(query))}` : ''],
-      async ([url, query]) => {
-        const { data } = await this.axios.get<T>(url + query)
+      url +
+        (filteredQuery ? `?${String(new URLSearchParams(filteredQuery))}` : ''),
+      async (url) => {
+        const { data } = await this.axios.get<T>(url)
         return data
       }
     )
@@ -156,7 +165,7 @@ export class Http {
   }
 
   useStudentCategories(studentId: string) {
-    return this.useGet<GetStudentCategoriesResponse>(`/v1/labor/teacher`, {
+    return this.useGet<Category[]>(`/v1/labor/teacher`, {
       student_id: studentId,
     })
   }
@@ -180,18 +189,18 @@ export class Http {
     return this.useGet<TeacherInfoResponse>('/v1/teacher/info/self')
   }
 
-  useTeacherClasses(schoolYear?: string) {
-    return this.useGet<Class[]>(
-      '/v1/teacher/class',
-      (schoolYear && {
-        'school-year': schoolYear,
-      }) ||
-        undefined
-    )
+  useClasses(schoolYear?: string) {
+    return this.useGet<Class[]>('/v1/teacher/class', {
+      'school-year': schoolYear,
+    })
   }
 
   useClassStudents(classId: number) {
-    return this.useGet<Student[]>(`/v1/teacher/student`, {
+    return this.useGet<
+      (Student & {
+        state: StudentState
+      })[]
+    >(`/v1/teacher/student`, {
       class_id: String(classId),
     })
   }
@@ -212,6 +221,26 @@ export class Http {
       '/v1/labor/teacher/rollback?' +
         String(new URLSearchParams({ id: String(id) }))
     )
+  }
+
+  useTeachers(schoolYear?: string) {
+    return this.useGet<TeacherClassesResponse>('/v1/teacher/class2teacher', {
+      'school-year': schoolYear,
+    })
+  }
+
+  async addTeacherClassRelation(teacherId: number, classId: number) {
+    await this.axios.post('/v1/teacher/class2teacher', {
+      teacher_id: teacherId,
+      class_id: classId,
+    })
+  }
+
+  async deleteTeacherClassRelation(teacherId: number, classId: number) {
+    await this.axios.post('/v1/teacher/class2teacher/delete', {
+      teacher_info_id: teacherId,
+      class_info_id: classId,
+    })
   }
 
   toast<T>(promise: Promise<T> | (() => Promise<T>), text = '提交') {

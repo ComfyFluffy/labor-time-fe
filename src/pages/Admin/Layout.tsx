@@ -28,7 +28,7 @@ import {
   useTheme,
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
-import { useEffect, useState } from 'react'
+import { ComponentType, useEffect, useState } from 'react'
 import { Outlet, useMatch, useNavigate } from 'react-router-dom'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import GroupsIcon from '@mui/icons-material/Groups'
@@ -37,6 +37,8 @@ import ImportExportIcon from '@mui/icons-material/ImportExport'
 import { http } from '../../http'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { SxProps } from '@mui/joy/styles/types'
+import { usePreferences } from '../../store'
+import shallow from 'zustand/shallow'
 
 const drawerWidth = 0o420
 
@@ -137,6 +139,7 @@ const NavBar = ({
         top: 0,
         left: 0,
         right: 0,
+        zIndex: 100,
 
         backgroundColor: 'rgba(255, 255, 255, 0.8)',
         [theme.getColorSchemeSelector('dark')]: {
@@ -172,13 +175,54 @@ const NavBar = ({
   )
 }
 
+interface NavListButtonProps {
+  to: string
+  title: string
+  Icon: ComponentType
+}
+
+const NavListButton = ({ to, title, Icon }: NavListButtonProps) => {
+  const match = useMatch(to)
+  const nav = useNavigate()
+  return (
+    <ListItemButton
+      selected={!!match}
+      variant={match ? 'soft' : undefined}
+      onClick={() => {
+        nav(to)
+      }}
+    >
+      <ListItemDecorator>
+        <Icon />
+      </ListItemDecorator>
+      <ListItemContent>{title}</ListItemContent>
+    </ListItemButton>
+  )
+}
+
 const NavDrawerList = () => {
-  const [classListOpen, setClassListOpen] = useState(true)
+  const [classListOpen, setClassListOpen] = usePreferences(
+    (state) => [state.classListOpen, state.setClassListOpen],
+    shallow
+  )
   const { data: teacherData, error: teacherError } = http.useTeacherInfo()
-  const { data: classesData, error: classesError } = http.useTeacherClasses()
+  const { data: classesData, error: classesError } = http.useClasses()
   const nav = useNavigate()
 
   const classRouteMatch = useMatch('/admin/class/:classId')
+
+  const links: NavListButtonProps[] = [
+    {
+      to: '/admin/userManage',
+      title: '用户管理',
+      Icon: SupervisorAccountIcon,
+    },
+    {
+      to: '/admin/dataManage',
+      title: '数据导入 / 导出',
+      Icon: ImportExportIcon,
+    },
+  ]
 
   return (
     <List
@@ -234,7 +278,7 @@ const NavDrawerList = () => {
           />
         </ListItemButton>
 
-        <Collapse in={classListOpen}>
+        <Collapse in={classListOpen} unmountOnExit timeout="auto">
           {classesData && (
             <List
               sx={{
@@ -273,23 +317,11 @@ const NavDrawerList = () => {
 
       <ListDivider />
 
-      <ListItem>
-        <ListItemButton>
-          <ListItemDecorator>
-            <SupervisorAccountIcon />
-          </ListItemDecorator>
-          <ListItemContent>用户管理</ListItemContent>
-        </ListItemButton>
-      </ListItem>
-
-      <ListItem>
-        <ListItemButton>
-          <ListItemDecorator>
-            <ImportExportIcon />
-          </ListItemDecorator>
-          <ListItemContent>数据导入 / 导出</ListItemContent>
-        </ListItemButton>
-      </ListItem>
+      {links.map((item) => (
+        <ListItem key={item.to}>
+          <NavListButton {...item} />
+        </ListItem>
+      ))}
     </List>
   )
 }
@@ -374,9 +406,8 @@ export const Layout = () => {
           noMenuTransition={!upLg}
         />
         <Container
-          maxWidth={false}
           sx={{
-            py: 1,
+            py: 2,
           }}
         >
           <Outlet />

@@ -41,6 +41,7 @@ const AskReason = ({
             placeholder="请选择或输入原因"
             options={autocompleteReasons}
             value={reason}
+            autoFocus
             onChange={(e, value) => setReason(value)}
             slotProps={{
               listbox: {
