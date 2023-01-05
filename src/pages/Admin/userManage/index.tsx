@@ -147,8 +147,19 @@ const DeleteConfirmDialog = ({
   )
 }
 
-const TeacherEditor = ({ teacher }: { teacher: TeacherClassesResponse[0] }) => {
-  const [addedClasses, setAddedClasses] = useState<Class[]>([])
+const TeacherEditor = ({
+  teacher,
+  onSaved,
+}: {
+  teacher: TeacherClassesResponse[0]
+  onSaved: () => void
+}) => {
+  const [addedClasses, setAddedClasses] = useState<Map<number, Class>>(
+    () => new Map()
+  )
+  const [removedClassIds, setRemovedClassIds] = useState<Set<number>>(
+    () => new Set()
+  )
 
   const [editingState, setEditingState] = useState({
     name: teacher.name,
@@ -159,8 +170,11 @@ const TeacherEditor = ({ teacher }: { teacher: TeacherClassesResponse[0] }) => {
   const [deleteOpen, setDeleteOpen] = useState(false)
 
   const displayClasses = useMemo(() => {
-    return [...teacher.classes, ...addedClasses]
-  }, [teacher.classes, addedClasses])
+    return [
+      ...teacher.classes.filter((c) => !removedClassIds.has(c.id)),
+      ...addedClasses.values(),
+    ]
+  }, [teacher.classes, addedClasses, removedClassIds])
 
   return (
     <Stack spacing={3}>
@@ -215,7 +229,17 @@ const TeacherEditor = ({ teacher }: { teacher: TeacherClassesResponse[0] }) => {
               <TableRow key={c.id}>
                 <TableCell>{c.name}</TableCell>
                 <TableCell align="right">
-                  <IconButton size="sm" color="danger">
+                  <IconButton
+                    size="sm"
+                    color="danger"
+                    onClick={() => {
+                      if (addedClasses.delete(c.id)) {
+                        setAddedClasses(new Map(addedClasses))
+                      } else {
+                        setRemovedClassIds(new Set(removedClassIds.add(c.id)))
+                      }
+                    }}
+                  >
                     <RemoveIcon />
                   </IconButton>
                 </TableCell>
@@ -224,7 +248,7 @@ const TeacherEditor = ({ teacher }: { teacher: TeacherClassesResponse[0] }) => {
             <TableRow>
               <ClassesAutocomplete
                 onAdd={(value) => {
-                  setAddedClasses((prev) => [...prev, value])
+                  setAddedClasses(new Map(addedClasses.set(value.id, value)))
                 }}
                 selectedClasses={displayClasses}
               />
@@ -320,7 +344,7 @@ const TeacherRow = ({
               maxWidth: 0o700,
             }}
           >
-            <TeacherEditor teacher={teacher} />
+            <TeacherEditor teacher={teacher} onSaved={() => {}} />
           </Collapse>
         </TableCell>
       </TableRow>
