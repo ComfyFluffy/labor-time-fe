@@ -1,83 +1,19 @@
 import {
   Alert,
-  Box,
+  Button,
+  Card,
   Container,
-  inputClasses,
   Link,
   Stack,
+  TextField,
   Typography,
 } from '@mui/joy'
-import { Button, TextField } from '@mui/material'
 import { AxiosError } from 'axios'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { http, UserType } from '../../http'
-const Circle = ({
-  size,
-  color,
-  top,
-  left,
-  blur = 3,
-}: {
-  size: number
-  color: string
-  top: number
-  left: number
-  blur?: number
-}) => {
-  const sizeCss = `${size}vh`
-  return (
-    <Box
-      sx={{
-        position: 'fixed',
-        borderRadius: '50%',
-        transform: 'translate(-50%, -50%)',
-        backgroundColor: color,
-        width: sizeCss,
-        height: sizeCss,
-        top: `${top}vh`,
-        left: `${left}vh`,
-        filter: `blur(${blur}px)`,
-      }}
-    />
-  )
-}
-
-const Background = () => {
-  const circles = [
-    {
-      color: 'rgba(255, 255, 255, 0.05)',
-      left: 30,
-      size: 70,
-      top: 30,
-    },
-    {
-      color: 'rgba(255, 255, 255, 0.02)',
-      left: 5,
-      size: 65,
-      top: 90,
-    },
-  ]
-  return (
-    <div>
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: -1,
-          background:
-            'linear-gradient(168deg, rgba(51,57,77,1) 0%, rgba(28,79,62,1) 100%)',
-        }}
-      />
-      {circles.map((circle) => (
-        <Circle {...circle} key={JSON.stringify(circle)} />
-      ))}
-    </div>
-  )
-}
+import { cyan, pink, purple } from '@mui/material/colors'
+import { alpha } from '@mui/material'
 
 export const Login = () => {
   const [credentials, setCredentials] = useState({
@@ -112,99 +48,126 @@ export const Login = () => {
 
   return (
     <Container
-      sx={{
+      maxWidth={false}
+      sx={(theme) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '80vh',
-      }}
+        height: '100vh',
+        backgroundImage: `linear-gradient(
+            180deg,
+            rgba(${theme.vars.palette.neutral.mainChannel} / 0.01),
+            rgba(${theme.vars.palette.primary.mainChannel} / 0.1) 100%
+          ),
+          radial-gradient(
+            ellipse at top left,
+            rgba(${theme.vars.palette.primary.mainChannel} / 0.2),
+            transparent 50%
+          ),
+          radial-gradient(
+            ellipse at top right,
+            ${alpha(cyan[300], 0.2)},
+            transparent 50%
+          ),
+          radial-gradient(
+            ellipse at center right,
+            ${alpha(purple[300], 0.2)},
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse at center left,
+            ${alpha(pink[300], 0.2)},
+            transparent 50%
+          )`,
+      })}
     >
-      <Background />
-
-      <Stack
-        spacing={5}
-        sx={{
-          width: 1,
-          [`& .${inputClasses.root}`]: {
-            background: 'rgba(255, 255, 255, 0.5)',
-          },
-        }}
-        component="form"
-        alignItems="center"
-        onSubmit={handleSubmit}
+      <Card
+        sx={(theme) => ({
+          p: 5,
+          mb: 2,
+          backdropFilter: 'blur(10px)',
+          background:
+            theme.palette.mode === 'dark'
+              ? 'rgba(0, 0, 0, 0.5)'
+              : 'rgba(255, 255, 255, 0.7)',
+        })}
       >
-        <Typography level="h3">
-          {userType === 'student'
-            ? '学生劳动实践学时认定'
-            : '学生劳动实践学时认定管理系统'}
-        </Typography>
         <Stack
-          spacing={3}
+          spacing={4}
           sx={{
             width: 1,
-            maxWidth: 0o450,
           }}
+          component="form"
+          alignItems="center"
+          onSubmit={handleSubmit}
         >
-          <TextField
-            label={userType === 'student' ? '学号' : '手机号'}
-            color="primary"
-            fullWidth
-            required
-            value={credentials.account}
-            onChange={(event) =>
-              setCredentials({
-                ...credentials,
-                account: event.target.value,
-              })
+          <Stack alignItems="center" spacing={1}>
+            <Typography level="h3">学生劳动实践学时认定</Typography>
+          </Stack>
+          <Stack
+            spacing={3}
+            sx={{
+              width: 1,
+              maxWidth: 0o450,
+            }}
+          >
+            <TextField
+              label={userType === 'student' ? '学号' : '教师手机号'}
+              color="primary"
+              fullWidth
+              required
+              value={credentials.account}
+              onChange={(event) =>
+                setCredentials({
+                  ...credentials,
+                  account: event.target.value,
+                })
+              }
+              error={!!errorMessage}
+            />
+            <TextField
+              type="password"
+              label="密码"
+              color="primary"
+              autoComplete="current-password"
+              fullWidth
+              required
+              value={credentials.password}
+              onChange={(event) =>
+                setCredentials({
+                  ...credentials,
+                  password: event.target.value,
+                })
+              }
+              error={!!errorMessage}
+            />
+            {errorMessage && <Alert color="danger">{errorMessage}</Alert>}
+          </Stack>
+
+          <Link
+            onClick={() =>
+              setUserType((userType) =>
+                userType === 'student' ? 'teacher' : 'student'
+              )
             }
-            error={!!errorMessage}
-          />
-          <TextField
-            type="password"
-            label="密码"
-            color="primary"
-            autoComplete="current-password"
-            fullWidth
-            required
-            value={credentials.password}
-            onChange={(event) =>
-              setCredentials({
-                ...credentials,
-                password: event.target.value,
-              })
-            }
-            error={!!errorMessage}
-          />
-          {errorMessage && <Alert color="danger">{errorMessage}</Alert>}
+          >
+            {userType === 'teacher' ? '学生登录' : '管理员登录'}
+          </Link>
+
+          <Button
+            type="submit"
+            sx={{
+              width: 0o160,
+            }}
+            variant="soft"
+            size="lg"
+            disabled={submitting}
+          >
+            登录
+          </Button>
         </Stack>
-
-        <Link
-          sx={{
-            color: 'rgb(230, 230, 100, 0.8)',
-          }}
-          onClick={() =>
-            setUserType((userType) =>
-              userType === 'student' ? 'teacher' : 'student'
-            )
-          }
-        >
-          {userType === 'teacher' ? '学生登录' : '管理员登录'}
-        </Link>
-
-        <Button
-          type="submit"
-          sx={{
-            width: 0o160,
-          }}
-          variant="outlined"
-          color="inherit"
-          size="large"
-          disabled={submitting}
-        >
-          登录
-        </Button>
-      </Stack>
+      </Card>
     </Container>
   )
 }

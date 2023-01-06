@@ -122,6 +122,7 @@ const Class = ({ classId }: { classId: number }) => {
                       '&:hover': {
                         backgroundColor: theme.vars.palette.primary.softBg,
                       },
+                      transition: 'background-color 0.25s',
                     })}
                   >
                     <TableCell>{student.student_id}</TableCell>
