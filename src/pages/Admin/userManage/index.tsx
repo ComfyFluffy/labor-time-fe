@@ -17,7 +17,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  tableCellClasses,
   TableContainer,
   TableHead,
   TableRow,
@@ -357,9 +356,6 @@ const TeacherRow = ({
     <>
       <TableRow
         sx={(theme) => ({
-          [`& > .${tableCellClasses.root}`]: {
-            padding: '12px',
-          },
           background: isNew
             ? `rgba(${theme.vars.palette.success.lightChannel} / 0.1)`
             : undefined,
@@ -441,7 +437,7 @@ const UserManage = () => {
 
       <Typography level="h4">教师列表</Typography>
       <TableContainer>
-        <Table aria-label="collapsible table">
+        <Table aria-label="collapsible table" size="small">
           <TableHead>
             <TableRow>
               <TableCell />

@@ -1,24 +1,81 @@
-import { Alert, Box, Stack, Typography } from '@mui/joy'
-import { DataGrid } from '@mui/x-data-grid'
+import {
+  Alert,
+  Chip,
+  ColorPaletteProp,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/joy'
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { http } from '../../../http'
-import { Student } from '../../../model'
+import { Student, StudentState } from '../../../model'
 import { Viewer } from './Viewer'
 
 export type ClassViewParams = {
   classId: string
 }
 
+const studentStateDisplay: Record<
+  StudentState,
+  {
+    color: ColorPaletteProp
+    text: string
+  }
+> = {
+  allApproved: {
+    color: 'success',
+    text: '已全部通过',
+  },
+  hasPendingItem: {
+    color: 'warning',
+    text: '有待审核项目',
+  },
+  hasRejectedItem: {
+    color: 'danger',
+    text: '有未通过项目',
+  },
+  notSubmitted: {
+    color: 'neutral',
+    text: '未提交',
+  },
+}
+
 const Class = ({ classId }: { classId: number }) => {
-  const { data, error } = http.useClassStudents(classId)
+  const { data, error, mutate } = http.useClassStudents(classId)
 
   const [viewerItem, setViewerItem] = useState<Student | null>(null)
 
+  const [searchText, setSearchText] = useState('')
+
+  const filteredData = data?.filter((student) => {
+    if (searchText === '') {
+      return true
+    }
+    return (
+      student.student_id.toString().includes(searchText) ||
+      student.name.includes(searchText)
+    )
+  })
+
   return (
-    <Stack>
+    <Stack spacing={2}>
       {error && <Alert color="danger">获取班级失败：{error.message}</Alert>}
-      {data && (
+
+      <TextField
+        label="搜索"
+        placeholder="学号 / 姓名"
+        sx={{
+          width: 0o400,
+        }}
+        value={searchText}
+        onChange={(e) => {
+          setSearchText(e.target.value)
+        }}
+      />
+
+      {filteredData && (
         <>
           {viewerItem && (
             <Viewer
@@ -26,40 +83,72 @@ const Class = ({ classId }: { classId: number }) => {
               open={viewerItem !== null}
               onClose={() => {
                 setViewerItem(null)
+                mutate()
               }}
             />
           )}
-          <Box
+
+          <Table
+            size="small"
             sx={{
-              height: 'calc(100vh - 128px)',
+              userSelect: 'none',
             }}
           >
-            <DataGrid
-              rows={data}
-              columns={[
-                { field: 'student_id', headerName: '学号', width: 0o150 },
-                {
-                  field: 'name',
-                  headerName: '姓名',
-                  width: 0o150,
-                  sortable: false,
-                },
-                {
-                  field: 'total_hours',
-                  headerName: '总有效时长',
-                  width: 0o150,
-                },
-                { field: 'state', headerName: '当前状态', width: 0o150 },
-              ]}
-              pageSize={50}
-              sx={{}}
-              onRowClick={(params) => {
-                setViewerItem(params.row as Student)
-              }}
-              disableSelectionOnClick
-            />
-          </Box>
+            <TableHead>
+              <TableRow>
+                <TableCell>学号</TableCell>
+                <TableCell>姓名</TableCell>
+                <TableCell
+                  sx={{
+                    maxWidth: 0o100,
+                  }}
+                >
+                  有效时长
+                </TableCell>
+                <TableCell>当前状态</TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {filteredData.map((student) => {
+                const stateDisplay = studentStateDisplay[student.state]
+                return (
+                  <TableRow
+                    key={student.student_id}
+                    onClick={() => {
+                      setViewerItem(student)
+                    }}
+                    sx={(theme) => ({
+                      '&:hover': {
+                        backgroundColor: theme.vars.palette.primary.softBg,
+                      },
+                    })}
+                  >
+                    <TableCell>{student.student_id}</TableCell>
+                    <TableCell>{student.name}</TableCell>
+                    <TableCell>{student.total_hours}</TableCell>
+                    <TableCell>
+                      <Chip color={stateDisplay.color} size="sm">
+                        {stateDisplay.text}
+                      </Chip>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
         </>
+      )}
+      {filteredData?.length === 0 && (
+        <Typography
+          level="body2"
+          color="neutral"
+          sx={{
+            pl: 2,
+          }}
+        >
+          无数据
+        </Typography>
       )}
     </Stack>
   )

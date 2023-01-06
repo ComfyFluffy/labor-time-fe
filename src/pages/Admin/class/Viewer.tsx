@@ -48,6 +48,7 @@ const AskReason = ({
                 disablePortal: true,
               },
             }}
+            freeSolo
           />
           <Stack direction="row" spacing={1} justifyContent="end">
             <Button
@@ -201,7 +202,7 @@ export const Viewer = ({
 
       <AskReason
         onSubmit={async (reason) => {
-          await http.rejectItem(reasonItemId!, reason || '')
+          await http.toastOnError(http.rejectItem(reasonItemId!, reason || ''))
           mutate()
           setAskReasonOpen(false)
         }}
