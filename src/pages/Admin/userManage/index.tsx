@@ -23,7 +23,7 @@ import {
   TableRow,
 } from '@mui/material'
 import { useMemo, useState } from 'react'
-import { http, TeacherClassesResponse } from '../../../http'
+import { http, TeacherWithClasses } from '../../../http'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import RemoveIcon from '@mui/icons-material/Remove'
 import AddIcon from '@mui/icons-material/Add'
@@ -152,8 +152,8 @@ const TeacherEditor = ({
   onMutated,
   isNew,
 }: {
-  teacher: TeacherClassesResponse[0]
-  onMutated: () => void
+  teacher: TeacherWithClasses
+  onMutated: (teacher?: TeacherWithClasses) => void
   isNew?: boolean
 }) => {
   const [addedClasses, setAddedClasses] = useState<Map<number, Class>>(
@@ -172,46 +172,56 @@ const TeacherEditor = ({
   const [deleteOpen, setDeleteOpen] = useState(false)
 
   const displayClasses = useMemo(() => {
-    return [
+    const classes = [
       ...teacher.classes.filter((c) => !removedClassIds.has(c.id)),
       ...addedClasses.values(),
-    ]
+    ].filter((c, i, classes) => classes.findIndex((c2) => c2.id === c.id) === i)
+    return classes
   }, [teacher.classes, addedClasses, removedClassIds])
 
   const handleSave = async () => {
     try {
+      let id = teacher.id
       if (isNew) {
         await http.toast(async () => {
-          await http.addTeacher({
+          id = await http.addTeacher({
             name: editingState.name,
             phone: editingState.phone,
             is_admin: editingState.is_admin,
           })
           await http.addTeacherClassRelations(
-            teacher.id,
+            id,
             Array.from(addedClasses.keys())
           )
         })
-        return
+      } else {
+        await http.toast(
+          Promise.all([
+            http.updateTeacher({
+              id: teacher.id,
+              ...editingState,
+            }),
+            http.addTeacherClassRelations(
+              teacher.id,
+              Array.from(addedClasses.keys())
+            ),
+            http.deleteTeacherClassRelations(
+              teacher.id,
+              Array.from(removedClassIds)
+            ),
+          ])
+        )
       }
 
-      await http.toast(
-        Promise.all([
-          http.updateTeacher({
-            id: teacher.id,
-            ...editingState,
-          }),
-          http.addTeacherClassRelations(
-            teacher.id,
-            Array.from(addedClasses.keys())
-          ),
-          http.deleteTeacherClassRelations(
-            teacher.id,
-            Array.from(removedClassIds)
-          ),
-        ])
-      )
-    } finally {
+      setAddedClasses(new Map())
+      setRemovedClassIds(new Set())
+
+      onMutated({
+        id,
+        ...editingState,
+        classes: displayClasses,
+      })
+    } catch {
       onMutated()
     }
   }
@@ -337,9 +347,9 @@ const TeacherRow = ({
   isNew,
   onMutated,
 }: {
-  teacher: TeacherClassesResponse[0]
+  teacher: TeacherWithClasses
   isNew?: boolean
-  onMutated: () => void
+  onMutated: (teacher?: TeacherWithClasses) => void
 }) => {
   const [open, setOpen] = useState(isNew) // open editor by default for new teacher
 
@@ -412,9 +422,9 @@ const TeacherRow = ({
 
 const UserManage = () => {
   const { data, error, mutate } = http.useTeachers()
-  const [addedTeacher, setAddedTeacher] = useState<
-    TeacherClassesResponse[0] | null
-  >(null)
+  const [addedTeacher, setAddedTeacher] = useState<TeacherWithClasses | null>(
+    null
+  )
 
   return (
     <Stack>
@@ -446,17 +456,23 @@ const UserManage = () => {
               <TeacherRow
                 key={teacher.id}
                 teacher={teacher}
-                onMutated={mutate}
+                onMutated={(teacher) => {
+                  if (teacher) {
+                    const index = data.findIndex((t) => t.id === teacher.id)
+                    const newData = [...data]
+                    newData[index] = teacher
+                    mutate(newData)
+                  } else {
+                    mutate()
+                  }
+                }}
               />
             ))}
             {addedTeacher && (
               <TeacherRow
                 teacher={addedTeacher}
                 isNew
-                onMutated={() => {
-                  setAddedTeacher(null)
-                  mutate()
-                }}
+                onMutated={() => mutate()}
               />
             )}
           </TableBody>

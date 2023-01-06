@@ -63,13 +63,9 @@ export type ApiError = AxiosError<{
   type: string
 }>
 
-export type TeacherInfoResponse = Teacher & {
+export type TeacherWithClasses = Teacher & {
   classes: Class[]
 }
-
-export type TeacherClassesResponse = (Teacher & {
-  classes: Class[]
-})[]
 
 export class Http {
   axios: AxiosInstance
@@ -186,7 +182,7 @@ export class Http {
   }
 
   useTeacherInfo() {
-    return this.useGet<TeacherInfoResponse>('/v1/teacher/info/self')
+    return this.useGet<TeacherWithClasses>('/v1/teacher/info/self')
   }
 
   useClasses(schoolYear?: string) {
@@ -224,7 +220,7 @@ export class Http {
   }
 
   useTeachers(schoolYear?: string) {
-    return this.useGet<TeacherClassesResponse>('/v1/teacher/class2teacher', {
+    return this.useGet<TeacherWithClasses[]>('/v1/teacher/class2teacher', {
       'school-year': schoolYear,
     })
   }
@@ -263,7 +259,8 @@ export class Http {
   }
 
   async addTeacher(teacher: Omit<Teacher, 'id'>) {
-    await this.axios.post('/v1/teacher/info', teacher)
+    return (await this.axios.post<{ id: number }>('/v1/teacher/info', teacher))
+      .data.id
   }
 
   async updateTeacher(teacher: Teacher) {
