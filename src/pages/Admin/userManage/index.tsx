@@ -149,14 +149,16 @@ const DeleteConfirmDialog = ({
 
 const TeacherEditor = ({
   teacher,
-  onSaved,
+  onMutated,
+  isNew,
 }: {
   teacher: TeacherClassesResponse[0]
-  onSaved: () => void
+  onMutated: () => void
+  isNew?: boolean
 }) => {
   const [addedClasses, setAddedClasses] = useState<Map<number, Class>>(
     () => new Map()
-  )
+  ) // Class id -> Class
   const [removedClassIds, setRemovedClassIds] = useState<Set<number>>(
     () => new Set()
   )
@@ -175,6 +177,52 @@ const TeacherEditor = ({
       ...addedClasses.values(),
     ]
   }, [teacher.classes, addedClasses, removedClassIds])
+
+  const handleSave = async () => {
+    try {
+      if (isNew) {
+        await http.toast(async () => {
+          await http.addTeacher({
+            name: editingState.name,
+            phone: editingState.phone,
+            is_admin: editingState.is_admin,
+          })
+          await http.addTeacherClassRelations(
+            teacher.id,
+            Array.from(addedClasses.keys())
+          )
+        })
+        return
+      }
+
+      await http.toast(
+        Promise.all([
+          http.updateTeacher({
+            id: teacher.id,
+            ...editingState,
+          }),
+          http.addTeacherClassRelations(
+            teacher.id,
+            Array.from(addedClasses.keys())
+          ),
+          http.deleteTeacherClassRelations(
+            teacher.id,
+            Array.from(removedClassIds)
+          ),
+        ])
+      )
+    } finally {
+      onMutated()
+    }
+  }
+
+  const handleDelete = async () => {
+    try {
+      await http.toastOnError(http.deleteTeacher(teacher.id))
+    } finally {
+      onMutated()
+    }
+  }
 
   return (
     <Stack spacing={3}>
@@ -258,23 +306,27 @@ const TeacherEditor = ({
       </Stack>
 
       <Stack direction="row" spacing={2}>
-        <Button color="success" startDecorator={<SaveIcon />}>
-          保存
-        </Button>
         <Button
-          color="danger"
-          startDecorator={<DeleteIcon />}
-          onClick={() => setDeleteOpen(true)}
+          color="success"
+          startDecorator={<SaveIcon />}
+          onClick={handleSave}
         >
-          删除用户
+          {isNew ? '创建用户' : '保存'}
         </Button>
+        {!isNew && (
+          <Button
+            color="danger"
+            startDecorator={<DeleteIcon />}
+            onClick={() => setDeleteOpen(true)}
+          >
+            删除用户
+          </Button>
+        )}
       </Stack>
       <DeleteConfirmDialog
         open={deleteOpen}
         setOpen={setDeleteOpen}
-        onConfirm={() => {
-          // TODO: delete teacher
-        }}
+        onConfirm={handleDelete}
       />
     </Stack>
   )
@@ -283,11 +335,13 @@ const TeacherEditor = ({
 const TeacherRow = ({
   teacher,
   isNew,
+  onMutated,
 }: {
   teacher: TeacherClassesResponse[0]
   isNew?: boolean
+  onMutated: () => void
 }) => {
-  const [open, setOpen] = useState(isNew)
+  const [open, setOpen] = useState(isNew) // open editor by default for new teacher
 
   return (
     <>
@@ -344,7 +398,11 @@ const TeacherRow = ({
               maxWidth: 0o700,
             }}
           >
-            <TeacherEditor teacher={teacher} onSaved={() => {}} />
+            <TeacherEditor
+              teacher={teacher}
+              onMutated={onMutated}
+              isNew={isNew}
+            />
           </Collapse>
         </TableCell>
       </TableRow>
@@ -353,7 +411,7 @@ const TeacherRow = ({
 }
 
 const UserManage = () => {
-  const { data, error } = http.useTeachers()
+  const { data, error, mutate } = http.useTeachers()
   const [addedTeacher, setAddedTeacher] = useState<
     TeacherClassesResponse[0] | null
   >(null)
@@ -385,9 +443,22 @@ const UserManage = () => {
 
           <TableBody>
             {data?.map((teacher) => (
-              <TeacherRow key={teacher.id} teacher={teacher} />
+              <TeacherRow
+                key={teacher.id}
+                teacher={teacher}
+                onMutated={mutate}
+              />
             ))}
-            {addedTeacher && <TeacherRow teacher={addedTeacher} isNew />}
+            {addedTeacher && (
+              <TeacherRow
+                teacher={addedTeacher}
+                isNew
+                onMutated={() => {
+                  setAddedTeacher(null)
+                  mutate()
+                }}
+              />
+            )}
           </TableBody>
         </Table>
       </TableContainer>

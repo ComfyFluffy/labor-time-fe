@@ -229,36 +229,89 @@ export class Http {
     })
   }
 
-  async addTeacherClassRelation(teacherId: number, classId: number) {
-    await this.axios.post('/v1/teacher/class2teacher', {
-      teacher_id: teacherId,
-      class_id: classId,
-    })
+  private async updateTeacherClassRelations(
+    route: string,
+    teacherId: number,
+    classIds: number[]
+  ) {
+    if (!classIds.length) {
+      return
+    }
+    await this.axios.post(
+      route,
+      classIds.map((classId) => ({
+        teacher_info_id: teacherId,
+        class_info_id: classId,
+      }))
+    )
   }
 
-  async deleteTeacherClassRelation(teacherId: number, classId: number) {
-    await this.axios.post('/v1/teacher/class2teacher/delete', {
-      teacher_info_id: teacherId,
-      class_info_id: classId,
-    })
+  async addTeacherClassRelations(teacherId: number, classIds: number[]) {
+    await this.updateTeacherClassRelations(
+      '/v1/teacher/class2teacher',
+      teacherId,
+      classIds
+    )
+  }
+
+  async deleteTeacherClassRelations(teacherId: number, classIds: number[]) {
+    await this.updateTeacherClassRelations(
+      '/v1/teacher/class2teacher/delete',
+      teacherId,
+      classIds
+    )
+  }
+
+  async addTeacher(teacher: Omit<Teacher, 'id'>) {
+    await this.axios.post('/v1/teacher/info', teacher)
+  }
+
+  async updateTeacher(teacher: Teacher) {
+    await this.axios.put('/v1/teacher/info', teacher)
+  }
+
+  async deleteTeacher(teacherId: number) {
+    await this.axios.delete(
+      '/v1/teacher/info?' +
+        String(new URLSearchParams({ id: String(teacherId) }))
+    )
+  }
+
+  private checkAxiosError(err: unknown) {
+    if (err instanceof AxiosError && err.response) {
+      return err.response.data.type || err.message
+    }
+    if (err instanceof Error) {
+      return err.message
+    }
+    return String(err)
   }
 
   toast<T>(promise: Promise<T> | (() => Promise<T>), text = '提交') {
-    toast.promise(promise, {
+    return toast.promise(promise, {
       pending: '正在' + text + '…',
       success: text + '成功',
       error: {
         render: ({ data }) => {
-          if (data instanceof AxiosError && data.response) {
-            return text + '错误：' + (data.response.data.type || data.message)
-          }
-          if (data instanceof Error) {
-            return text + '错误：' + data.message
-          }
-          return text + '错误'
+          return text + '失败：' + this.checkAxiosError(data)
         },
       },
     })
+  }
+
+  async toastOnError<T>(
+    promise: Promise<T> | (() => Promise<T>),
+    text = '提交'
+  ) {
+    try {
+      if (typeof promise === 'function') {
+        return await promise()
+      }
+      return await promise
+    } catch (e) {
+      toast.error(text + '失败：' + this.checkAxiosError(e))
+      throw e
+    }
   }
 }
 

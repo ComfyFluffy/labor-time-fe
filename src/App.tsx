@@ -4,14 +4,14 @@ import { ToastContainer } from 'react-toastify'
 import { router } from './router'
 
 export const App = () => {
-  const { mode } = useColorScheme()
+  const { colorScheme } = useColorScheme()
 
   return (
     <>
       <CssBaseline />
 
       <RouterProvider router={router} />
-      <ToastContainer theme={mode === 'dark' ? 'colored' : 'light'} />
+      <ToastContainer theme={colorScheme === 'dark' ? 'colored' : 'light'} />
     </>
   )
 }
