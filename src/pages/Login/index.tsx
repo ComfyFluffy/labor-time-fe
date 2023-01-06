@@ -152,7 +152,7 @@ export const Login = () => {
               )
             }
           >
-            {userType === 'teacher' ? '学生登录' : '管理员登录'}
+            {userType === 'teacher' ? '学生登录' : '教师登录'}
           </Link>
 
           <Button
