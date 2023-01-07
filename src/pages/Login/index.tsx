@@ -132,12 +132,15 @@ export const Login = () => {
               fullWidth
               required
               value={credentials.account}
-              onChange={(event) =>
+              onChange={(event) => {
                 setCredentials({
                   ...credentials,
                   account: event.target.value,
                 })
-              }
+                if (!event.target.value && !credentials.password) {
+                  setErrorMessage('')
+                }
+              }}
               error={!!errorMessage}
             />
             <TextField
@@ -148,12 +151,15 @@ export const Login = () => {
               fullWidth
               required
               value={credentials.password}
-              onChange={(event) =>
+              onChange={(event) => {
                 setCredentials({
                   ...credentials,
                   password: event.target.value,
                 })
-              }
+                if (!credentials.account && !event.target.value) {
+                  setErrorMessage('')
+                }
+              }}
               error={!!errorMessage}
             />
             {errorMessage && <Alert color="danger">{errorMessage}</Alert>}
