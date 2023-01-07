@@ -48,16 +48,7 @@ export const Login = () => {
   }
 
   return (
-    <Container
-      maxWidth={false}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '95vh',
-      }}
-    >
+    <>
       <Box
         sx={(theme) => ({
           position: 'fixed',
@@ -66,128 +57,139 @@ export const Login = () => {
           right: 0,
           bottom: 0,
           zIndex: -1,
-          filter: 'blur(48px)',
 
-          backgroundImage: `linear-gradient(
-          180deg,
-          rgba(${theme.vars.palette.neutral.mainChannel} / 0.01),
-          rgba(${theme.vars.palette.primary.mainChannel} / 0.1) 100%
-        ),
-        radial-gradient(
-          ellipse at top left,
-          rgba(${theme.vars.palette.primary.mainChannel} / 0.2),
-          transparent 50%
-        ),
-        radial-gradient(
-          ellipse at top right,
-          ${alpha(cyan[300], 0.2)},
-          transparent 50%
-        ),
-        radial-gradient(
-          ellipse at center right,
-          ${alpha(purple[300], 0.2)},
-          transparent 55%
-        ),
-        radial-gradient(
-          ellipse at center left,
-          ${alpha(pink[300], 0.2)},
-          transparent 50%
-        )`,
+          backgroundImage: `
+            linear-gradient(
+              180deg,
+              rgba(${theme.vars.palette.neutral.mainChannel} / 0.01),
+              rgba(${theme.vars.palette.primary.mainChannel} / 0.1) 100%
+            ),
+            radial-gradient(
+              ellipse at top left,
+              rgba(${theme.vars.palette.primary.mainChannel} / 0.3),
+              transparent 50%
+            ),
+            radial-gradient(
+              ellipse at top right,
+              ${alpha(cyan[300], 0.3)},
+              transparent 50%
+            ),
+            radial-gradient(
+              ellipse at center right,
+              ${alpha(purple[300], 0.3)},
+              transparent 55%
+            ),
+            radial-gradient(
+              ellipse at center left,
+              ${alpha(pink[300], 0.3)},
+              transparent 50%
+            )`,
         })}
       />
-      <Card
-        sx={(theme) => ({
-          p: 5,
-          width: 0o600,
-          maxWidth: 1,
-          backdropFilter: 'blur(10px)',
-          background:
-            theme.palette.mode === 'dark'
-              ? 'rgba(0, 0, 0, 0.5)'
-              : 'rgba(255, 255, 255, 0.7)',
-        })}
+      <Container
+        maxWidth={false}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '95vh',
+          backdropFilter: 'blur(48px)',
+        }}
       >
-        <Stack
-          spacing={4}
-          sx={{
-            width: 1,
-          }}
-          component="form"
-          alignItems="center"
-          onSubmit={handleSubmit}
+        <Card
+          sx={(theme) => ({
+            p: 5,
+            width: 0o600,
+            maxWidth: 1,
+            background:
+              theme.palette.mode === 'dark'
+                ? 'rgba(0, 0, 0, 0.5)'
+                : 'rgba(255, 255, 255, 0.7)',
+          })}
         >
-          <Stack alignItems="center" spacing={1}>
-            <Typography level="h4">学生劳动实践学时认定</Typography>
-          </Stack>
           <Stack
-            spacing={3}
+            spacing={4}
             sx={{
               width: 1,
-              maxWidth: 0o450,
             }}
+            component="form"
+            alignItems="center"
+            onSubmit={handleSubmit}
           >
-            <TextField
-              label={userType === 'student' ? '学号' : '教师手机号'}
-              color="primary"
-              fullWidth
-              required
-              value={credentials.account}
-              onChange={(event) => {
-                setCredentials({
-                  ...credentials,
-                  account: event.target.value,
-                })
-                if (!event.target.value && !credentials.password) {
-                  setErrorMessage('')
-                }
+            <Stack alignItems="center" spacing={1}>
+              <Typography level="h4">学生劳动实践学时认定</Typography>
+            </Stack>
+            <Stack
+              spacing={3}
+              sx={{
+                width: 1,
+                maxWidth: 0o450,
               }}
-              error={!!errorMessage}
-            />
-            <TextField
-              type="password"
-              label="密码"
-              color="primary"
-              autoComplete="current-password"
-              fullWidth
-              required
-              value={credentials.password}
-              onChange={(event) => {
-                setCredentials({
-                  ...credentials,
-                  password: event.target.value,
-                })
-                if (!credentials.account && !event.target.value) {
-                  setErrorMessage('')
-                }
+            >
+              <TextField
+                label={userType === 'student' ? '学号' : '教师手机号'}
+                color="primary"
+                fullWidth
+                required
+                value={credentials.account}
+                onChange={(event) => {
+                  setCredentials({
+                    ...credentials,
+                    account: event.target.value,
+                  })
+                  if (!event.target.value && !credentials.password) {
+                    setErrorMessage('')
+                  }
+                }}
+                error={!!errorMessage}
+              />
+              <TextField
+                type="password"
+                label="密码"
+                color="primary"
+                autoComplete="current-password"
+                fullWidth
+                required
+                value={credentials.password}
+                onChange={(event) => {
+                  setCredentials({
+                    ...credentials,
+                    password: event.target.value,
+                  })
+                  if (!credentials.account && !event.target.value) {
+                    setErrorMessage('')
+                  }
+                }}
+                error={!!errorMessage}
+              />
+              {errorMessage && <Alert color="danger">{errorMessage}</Alert>}
+            </Stack>
+
+            <Link
+              onClick={() =>
+                setUserType((userType) =>
+                  userType === 'student' ? 'teacher' : 'student'
+                )
+              }
+            >
+              {userType === 'teacher' ? '学生登录' : '教师登录'}
+            </Link>
+
+            <Button
+              type="submit"
+              sx={{
+                width: 0o160,
               }}
-              error={!!errorMessage}
-            />
-            {errorMessage && <Alert color="danger">{errorMessage}</Alert>}
+              variant="soft"
+              size="lg"
+              disabled={submitting}
+            >
+              登录
+            </Button>
           </Stack>
-
-          <Link
-            onClick={() =>
-              setUserType((userType) =>
-                userType === 'student' ? 'teacher' : 'student'
-              )
-            }
-          >
-            {userType === 'teacher' ? '学生登录' : '教师登录'}
-          </Link>
-
-          <Button
-            type="submit"
-            sx={{
-              width: 0o160,
-            }}
-            variant="soft"
-            size="lg"
-            disabled={submitting}
-          >
-            登录
-          </Button>
-        </Stack>
-      </Card>
-    </Container>
+        </Card>
+      </Container>
+    </>
   )
 }
