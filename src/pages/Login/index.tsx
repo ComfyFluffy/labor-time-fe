@@ -1,5 +1,6 @@
 import {
   Alert,
+  Box,
   Button,
   Card,
   Container,
@@ -49,43 +50,56 @@ export const Login = () => {
   return (
     <Container
       maxWidth={false}
-      sx={(theme) => ({
+      sx={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100vh',
-        backgroundImage: `linear-gradient(
-            180deg,
-            rgba(${theme.vars.palette.neutral.mainChannel} / 0.01),
-            rgba(${theme.vars.palette.primary.mainChannel} / 0.1) 100%
-          ),
-          radial-gradient(
-            ellipse at top left,
-            rgba(${theme.vars.palette.primary.mainChannel} / 0.2),
-            transparent 50%
-          ),
-          radial-gradient(
-            ellipse at top right,
-            ${alpha(cyan[300], 0.2)},
-            transparent 50%
-          ),
-          radial-gradient(
-            ellipse at center right,
-            ${alpha(purple[300], 0.2)},
-            transparent 55%
-          ),
-          radial-gradient(
-            ellipse at center left,
-            ${alpha(pink[300], 0.2)},
-            transparent 50%
-          )`,
-      })}
+        height: '95vh',
+      }}
     >
+      <Box
+        sx={(theme) => ({
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: -1,
+          filter: 'blur(48px)',
+
+          backgroundImage: `linear-gradient(
+          180deg,
+          rgba(${theme.vars.palette.neutral.mainChannel} / 0.01),
+          rgba(${theme.vars.palette.primary.mainChannel} / 0.1) 100%
+        ),
+        radial-gradient(
+          ellipse at top left,
+          rgba(${theme.vars.palette.primary.mainChannel} / 0.2),
+          transparent 50%
+        ),
+        radial-gradient(
+          ellipse at top right,
+          ${alpha(cyan[300], 0.2)},
+          transparent 50%
+        ),
+        radial-gradient(
+          ellipse at center right,
+          ${alpha(purple[300], 0.2)},
+          transparent 55%
+        ),
+        radial-gradient(
+          ellipse at center left,
+          ${alpha(pink[300], 0.2)},
+          transparent 50%
+        )`,
+        })}
+      />
       <Card
         sx={(theme) => ({
           p: 5,
-          mb: 2,
+          width: 0o600,
+          maxWidth: 1,
           backdropFilter: 'blur(10px)',
           background:
             theme.palette.mode === 'dark'
@@ -103,7 +117,7 @@ export const Login = () => {
           onSubmit={handleSubmit}
         >
           <Stack alignItems="center" spacing={1}>
-            <Typography level="h3">学生劳动实践学时认定</Typography>
+            <Typography level="h4">学生劳动实践学时认定</Typography>
           </Stack>
           <Stack
             spacing={3}
