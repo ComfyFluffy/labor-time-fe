@@ -22,4 +22,9 @@ module.exports = {
     '@typescript-eslint/no-extra-semi': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
   },
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
 }
