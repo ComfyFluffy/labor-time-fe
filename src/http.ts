@@ -67,6 +67,11 @@ export type TeacherWithClasses = Teacher & {
   classes: Class[]
 }
 
+export interface SchoolYearResponse {
+  school_years: string[]
+  current_school_year: string
+}
+
 export class Http {
   axios: AxiosInstance
 
@@ -168,6 +173,10 @@ export class Http {
 
   useCategories() {
     return this.useGet<Category[]>('/v1/labor/student')
+  }
+
+  useSchoolYears() {
+    return this.useGet<SchoolYearResponse>('/v1/teacher/school-year')
   }
 
   async updateItems(

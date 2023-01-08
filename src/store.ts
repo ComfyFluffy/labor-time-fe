@@ -7,6 +7,8 @@ export interface PreferencesStore {
   confirmPersonalInfo: () => void
   classListOpen: boolean
   setClassListOpen: (open: boolean) => void
+  selectedSchoolYear: string | null
+  setSelectedSchoolYear: (schoolYear: string | null) => void
 
   token?: string
   loggedUserType?: UserType
@@ -37,10 +39,15 @@ export const usePreferences = create<PreferencesStore>()(
         set({
           classListOpen,
         }),
+      selectedSchoolYear: null,
+      setSelectedSchoolYear: (selectedSchoolYear) =>
+        set({
+          selectedSchoolYear,
+        }),
     }),
     {
       name: 'labor-preferences',
-      version: 3,
+      version: 4,
     }
   )
 )

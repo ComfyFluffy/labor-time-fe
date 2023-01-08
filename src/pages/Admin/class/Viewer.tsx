@@ -56,7 +56,7 @@ const AskReason = ({
             autoFocus
             slotProps={{
               listbox: {
-                disablePortal: true,
+                disablePortal: true, // disable portal to fix the bug that the listbox is not visible
               },
             }}
             freeSolo

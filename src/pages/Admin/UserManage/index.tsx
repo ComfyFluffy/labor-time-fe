@@ -387,9 +387,9 @@ const TeacherRow = ({
 
       <TableRow>
         <TableCell
-          style={{
-            paddingBottom: 0,
-            paddingTop: 0,
+          sx={{
+            pb: 0,
+            pt: 0,
             border: open ? undefined : 'unset',
           }}
           colSpan={5}

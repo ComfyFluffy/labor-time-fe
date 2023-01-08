@@ -1,5 +1,6 @@
 import {
   Alert,
+  Button,
   Chip,
   ColorPaletteProp,
   Stack,
@@ -7,11 +8,13 @@ import {
   Typography,
 } from '@mui/joy'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { http } from '../../../http'
 import { Student, StudentState } from '../../../model'
 import { Viewer } from './Viewer'
+import FileDownloadIcon from '@mui/icons-material/FileDownload'
+import EditIcon from '@mui/icons-material/Edit'
 
 export type ClassViewParams = {
   classId: string
@@ -44,24 +47,45 @@ const studentStateDisplay: Record<
 
 const Class = ({ classId }: { classId: number }) => {
   const { data, error, mutate } = http.useClassStudents(classId)
+  const { data: classesData } = http.useClasses()
 
   const [viewerItem, setViewerItem] = useState<Student | null>(null)
 
   const [searchText, setSearchText] = useState('')
 
+  const className = useMemo(
+    () => classesData?.find((c) => c.id === classId)?.name,
+    [classesData, classId]
+  )
+
+  useEffect(() => {
+    setSearchText('')
+  }, [classId])
+
   const filteredData = data?.filter((student) => {
-    if (searchText === '') {
+    if (!searchText) {
       return true
     }
     return (
-      student.student_id.toString().includes(searchText) ||
+      student.student_id.includes(searchText) ||
       student.name.includes(searchText)
     )
   })
 
   return (
     <Stack spacing={2}>
-      {error && <Alert color="danger">获取班级失败：{error.message}</Alert>}
+      {error && <Alert color="danger">获取班级数据失败：{error.message}</Alert>}
+
+      {className && <Typography level="h4">{className}</Typography>}
+
+      <Stack direction="row" spacing={2} alignItems="center">
+        <Button startDecorator={<FileDownloadIcon />} color="primary">
+          导出表格
+        </Button>
+        <Button startDecorator={<EditIcon />} color="success">
+          添加学生
+        </Button>
+      </Stack>
 
       <TextField
         label="搜索"

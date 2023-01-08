@@ -39,6 +39,8 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { SxProps } from '@mui/joy/styles/types'
 import { usePreferences } from '../../store'
 import shallow from 'zustand/shallow'
+import SettingsIcon from '@mui/icons-material/Settings'
+import PieChartIcon from '@mui/icons-material/PieChart'
 
 const drawerWidth = 0o420
 
@@ -74,11 +76,25 @@ interface NavBarProps {
 }
 
 const SchoolYearSwitcher = () => {
-  const years = ['2021-2022']
+  const { data } = http.useSchoolYears()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  return (
-    <>
+
+  const [selectedSchoolYear, setSelectedSchoolYear] = usePreferences(
+    (state) => [state.selectedSchoolYear, state.setSelectedSchoolYear],
+    shallow
+  )
+  useEffect(() => {
+    if (
+      data &&
+      (selectedSchoolYear === null ||
+        !data.school_years.includes(selectedSchoolYear))
+    ) {
+      setSelectedSchoolYear(data.current_school_year || null)
+    }
+  }, [data, selectedSchoolYear, setSelectedSchoolYear])
+
+  return data ? (
+    <Box>
       <Button
         endDecorator={<ArrowDropDownIcon />}
         variant="soft"
@@ -86,7 +102,7 @@ const SchoolYearSwitcher = () => {
           setAnchorEl(event.currentTarget)
         }}
       >
-        {years[selectedIndex] + ' 学年'}
+        {selectedSchoolYear + ' 学年'}
       </Button>
       <Menu
         anchorEl={anchorEl}
@@ -95,12 +111,13 @@ const SchoolYearSwitcher = () => {
           setAnchorEl(null)
         }}
       >
-        {years.map((year, index) => (
+        {data.school_years.map((year) => (
           <MenuItem
             key={year}
-            selected={index === selectedIndex}
+            selected={year === selectedSchoolYear}
+            variant={year === selectedSchoolYear ? 'soft' : undefined}
             onClick={() => {
-              setSelectedIndex(index)
+              setSelectedSchoolYear(year)
               setAnchorEl(null)
             }}
           >
@@ -108,8 +125,8 @@ const SchoolYearSwitcher = () => {
           </MenuItem>
         ))}
       </Menu>
-    </>
-  )
+    </Box>
+  ) : null
 }
 
 const NavBar = ({
@@ -157,7 +174,7 @@ const NavBar = ({
           timeout={{
             enter: theme.transitions.duration.enteringScreen,
             exit: theme.transitions.duration.leavingScreen,
-          }} // Match the drawer
+          }} // Match with the drawer
         >
           {menuButton}
         </Collapse>
@@ -213,14 +230,28 @@ const NavDrawerList = () => {
 
   const links: NavListButtonProps[] = [
     {
-      to: '/admin/userManage',
-      title: '用户管理',
-      Icon: SupervisorAccountIcon,
+      to: '/admin/overview',
+      title: '数据总览',
+      Icon: PieChartIcon,
     },
     {
-      to: '/admin/dataManage',
+      to: '/admin/data-manage',
       title: '数据导入 / 导出',
       Icon: ImportExportIcon,
+    },
+  ]
+
+  const adminLinks: NavListButtonProps[] = [
+    {
+      to: '/admin/user-manage',
+      title: '教师用户管理',
+      Icon: SupervisorAccountIcon,
+    },
+
+    {
+      to: '/admin/system-manage',
+      title: '系统管理',
+      Icon: SettingsIcon,
     },
   ]
 
@@ -262,9 +293,18 @@ const NavDrawerList = () => {
         </ListItem>
       )}
 
-      <ListDivider />
+      {links.map((item) => (
+        <ListItem key={item.to}>
+          <NavListButton {...item} />
+        </ListItem>
+      ))}
 
-      <ListItem nested>
+      <ListItem
+        nested
+        sx={{
+          my: '6px',
+        }}
+      >
         <ListItemButton onClick={() => setClassListOpen(!classListOpen)}>
           <ListItemDecorator>
             <GroupsIcon />
@@ -315,13 +355,16 @@ const NavDrawerList = () => {
         </Collapse>
       </ListItem>
 
-      <ListDivider />
-
-      {links.map((item) => (
-        <ListItem key={item.to}>
-          <NavListButton {...item} />
-        </ListItem>
-      ))}
+      {teacherData?.is_admin && (
+        <>
+          <ListDivider />
+          {adminLinks.map((item) => (
+            <ListItem key={item.to}>
+              <NavListButton {...item} />
+            </ListItem>
+          ))}
+        </>
+      )}
     </List>
   )
 }
