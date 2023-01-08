@@ -108,7 +108,11 @@ export const Login = () => {
         nav(userType === 'student' ? '/student' : '/admin')
       } catch (err) {
         if (err instanceof AxiosError) {
-          setErrorMessage(err.response?.data.type || err.message)
+          let message: string | undefined = err.response?.data.type
+          if (message?.includes('账号不存在')) {
+            message += '，请检查账号类型'
+          }
+          setErrorMessage(message || err.message)
         } else if (err instanceof Error) {
           setErrorMessage(err.message)
         }
