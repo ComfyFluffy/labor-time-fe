@@ -30,19 +30,30 @@ const AskReason = ({
   const autocompleteReasons = ['证据无效', '证据不符合要求', '证据不完整']
 
   const [reason, setReason] = useState<string | null>(null)
+  const [reasonInput, setReasonInput] = useState('')
 
   return (
     <Modal open={open} onClose={onClose}>
       <ModalDialog>
         <ModalClose />
-        <Stack spacing={2}>
+        <Stack
+          spacing={2}
+          component="form"
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit(reasonInput)
+          }}
+        >
           <Typography level="h5">打回原因</Typography>
           <Autocomplete
+            required
             placeholder="请选择或输入原因"
             options={autocompleteReasons}
             value={reason}
-            autoFocus
             onChange={(e, value) => setReason(value)}
+            inputValue={reasonInput}
+            onInputChange={(e, value) => setReasonInput(value)}
+            autoFocus
             slotProps={{
               listbox: {
                 disablePortal: true,
@@ -51,13 +62,7 @@ const AskReason = ({
             freeSolo
           />
           <Stack direction="row" spacing={1} justifyContent="end">
-            <Button
-              color="danger"
-              variant="soft"
-              onClick={() => {
-                onSubmit(reason)
-              }}
-            >
+            <Button color="danger" variant="soft" type="submit">
               打回
             </Button>
           </Stack>
@@ -149,7 +154,9 @@ export const Viewer = ({
                                 color="success"
                                 variant="soft"
                                 onClick={async () => {
-                                  await http.passItem(item.id)
+                                  await http.toastOnError(
+                                    http.passItem(item.id)
+                                  )
                                   mutate()
                                 }}
                               >
@@ -176,7 +183,9 @@ export const Viewer = ({
                                 color="warning"
                                 variant="soft"
                                 onClick={async () => {
-                                  await http.setItemPending(item.id)
+                                  await http.toastOnError(
+                                    http.setItemPending(item.id)
+                                  )
                                   mutate()
                                 }}
                               >
