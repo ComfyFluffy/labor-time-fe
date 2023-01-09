@@ -60,7 +60,6 @@ const ClassesAutocomplete = ({
       >
         <Autocomplete
           loading={isLoading}
-          loadingText="加载中..."
           options={filteredClasses}
           getOptionLabel={(option) => option.name}
           placeholder="添加班级"
