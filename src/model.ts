@@ -1,9 +1,11 @@
 export type ItemState = 'pending' | 'approved' | 'rejected'
-export type StudentState =
-  | 'allApproved'
-  | 'hasPendingItem'
-  | 'hasRejectedItem'
-  | 'notSubmitted'
+export const studentStates = [
+  'allApproved',
+  'hasPendingItem',
+  'hasRejectedItem',
+  'notSubmitted',
+] as const
+export type StudentState = typeof studentStates[number]
 
 export interface Item {
   id: number
