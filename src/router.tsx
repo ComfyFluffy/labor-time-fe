@@ -48,7 +48,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: '',
-            element: <Navigate to="stats" replace />,
+            element: <Navigate to="overview" replace />,
           },
           {
             path: 'overview',

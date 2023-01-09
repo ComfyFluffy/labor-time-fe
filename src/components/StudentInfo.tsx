@@ -3,7 +3,7 @@ import { Student } from '../model'
 
 export const StudentInfo = ({ student }: { student: Student }) => {
   return (
-    <Stack spacing={2}>
+    <Stack spacing={3}>
       <Stack direction="row" spacing={2}>
         <Stack>
           <Typography color="neutral">学号</Typography>
@@ -19,7 +19,7 @@ export const StudentInfo = ({ student }: { student: Student }) => {
         </Stack>
       </Stack>
 
-      <Stack spacing={1}>
+      <Stack spacing={2}>
         <Button color="danger" variant="soft">
           清空所有事项
         </Button>
