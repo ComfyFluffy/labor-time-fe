@@ -2,6 +2,7 @@ import {
   Alert,
   Box,
   Button,
+  Card,
   Chip,
   Container,
   IconButton,
@@ -33,7 +34,6 @@ import { Outlet, useMatch, useNavigate } from 'react-router-dom'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import GroupsIcon from '@mui/icons-material/Groups'
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
-import ImportExportIcon from '@mui/icons-material/ImportExport'
 import { http } from '../../http'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { SxProps } from '@mui/joy/styles/types'
@@ -234,11 +234,6 @@ const NavDrawerList = () => {
       title: '数据总览',
       Icon: PieChartIcon,
     },
-    {
-      to: '/admin/data-manage',
-      title: '数据导入 / 导出',
-      Icon: ImportExportIcon,
-    },
   ]
 
   const adminLinks: NavListButtonProps[] = [
@@ -275,7 +270,11 @@ const NavDrawerList = () => {
 
       {teacherData && (
         <ListItem>
-          <ListItemButton>
+          <Card
+            sx={{
+              width: 1,
+            }}
+          >
             <Stack
               sx={{
                 pl: 2,
@@ -289,7 +288,7 @@ const NavDrawerList = () => {
               </Stack>
               <Chip size="sm">{teacherData.is_admin ? '管理员' : '教师'}</Chip>
             </Stack>
-          </ListItemButton>
+          </Card>
         </ListItem>
       )}
 
