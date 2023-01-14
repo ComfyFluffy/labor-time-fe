@@ -1,5 +1,7 @@
+import { Stack } from '@mui/joy'
+
 const SystemManage = () => {
-  return null
+  return <Stack></Stack>
 }
 
 export default SystemManage

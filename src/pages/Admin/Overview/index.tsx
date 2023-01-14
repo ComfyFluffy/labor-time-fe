@@ -2,7 +2,8 @@ import { Alert, Button, Checkbox, Stack, styled, Typography } from '@mui/joy'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import { http, ClassesStatsResponse } from '../../../http'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const FlexCenter = styled('div')({
   display: 'flex',
@@ -19,15 +20,26 @@ const Row = ({
   checked: boolean
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }) => {
+  const checkboxRef = useRef<HTMLSpanElement>(null)
+
+  const nav = useNavigate()
+
   return (
-    <TableRow>
+    <TableRow
+      onClick={() => {
+        nav(`/admin/class/${row.class.id}`)
+      }}
+    >
       <TableCell
         sx={{
           width: 0o70,
         }}
+        onClick={(e) => {
+          e.stopPropagation()
+        }}
       >
         <FlexCenter>
-          <Checkbox onChange={onChange} checked={checked} />
+          <Checkbox onChange={onChange} checked={checked} ref={checkboxRef} />
         </FlexCenter>
       </TableCell>
       <TableCell>{row.class.name}</TableCell>
