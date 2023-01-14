@@ -113,9 +113,17 @@ export const Viewer = ({
             />
           </Stack>
           <Stack spacing={2} direction={downSm ? 'column' : 'row'}>
-            <Stack spacing={1}>
-              <Typography level="h5">学生信息</Typography>
-              <StudentInfo student={student} />
+            <Stack spacing={2}>
+              <Stack spacing={1}>
+                <Typography level="h5">学生信息</Typography>
+                <StudentInfo student={student} />
+              </Stack>
+              <Stack spacing={1}>
+                <Button color="danger" variant="soft">
+                  清空所有事项
+                </Button>
+                <Button color="danger">从班级移除该学生</Button>
+              </Stack>
             </Stack>
 
             <Divider orientation={downSm ? 'horizontal' : 'vertical'} />
