@@ -72,6 +72,17 @@ export interface SchoolYearResponse {
   current_school_year: string
 }
 
+export type ClassesStatsResponse = {
+  class: Class
+  statistics: {
+    total: number
+    all_approved: number
+    has_pending_item: number
+    has_reject_item: number
+    not_submitted: number
+  }
+}[]
+
 export class Http {
   axios: AxiosInstance
 
@@ -281,6 +292,12 @@ export class Http {
       '/v1/teacher/info?' +
         String(new URLSearchParams({ id: String(teacherId) }))
     )
+  }
+
+  useClassesStats(schoolYear?: string) {
+    return this.useGet<ClassesStatsResponse>('/v1/teacher/statistics', {
+      schoolYear,
+    })
   }
 
   private checkAxiosError(err: unknown) {
