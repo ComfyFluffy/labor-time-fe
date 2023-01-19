@@ -42,7 +42,6 @@ import PieChartIcon from '@mui/icons-material/PieChart'
 interface NavBarProps {
   onMenuClick?: IconButtonProps['onClick']
   showMenuButton?: boolean
-  noMenuTransition?: boolean
 }
 
 const SchoolYearSwitcher = () => {
@@ -99,18 +98,7 @@ const SchoolYearSwitcher = () => {
   ) : null
 }
 
-const NavBar = ({
-  onMenuClick,
-  showMenuButton,
-  noMenuTransition,
-}: NavBarProps) => {
-  const menuButton = (
-    <IconButton variant="plain" onClick={onMenuClick}>
-      <MenuIcon />
-    </IconButton>
-  )
-
-  const theme = useTheme()
+const NavBar = ({ onMenuClick, showMenuButton }: NavBarProps) => {
   const { data } = http.useTeacherInfo()
 
   return (
@@ -137,19 +125,10 @@ const NavBar = ({
         borderStyle: 'solid',
       })}
     >
-      {noMenuTransition ? (
-        menuButton
-      ) : (
-        <Collapse
-          in={showMenuButton}
-          orientation="horizontal"
-          timeout={{
-            enter: theme.transitions.duration.enteringScreen,
-            exit: theme.transitions.duration.leavingScreen,
-          }} // Match with the drawer
-        >
-          {menuButton}
-        </Collapse>
+      {showMenuButton && (
+        <IconButton variant="plain" onClick={onMenuClick} size="sm">
+          <MenuIcon />
+        </IconButton>
       )}
 
       <SchoolYearSwitcher />
@@ -383,18 +362,21 @@ export const Layout = () => {
 
   const drawerOpen = upLg || temporaryDrawerOpen
 
+  useEffect(() => {
+    setTemporaryDrawerOpen(false)
+  }, [upLg])
+
   return (
     <Stack direction="row">
       <NavDrawer
         open={drawerOpen}
         setOpen={setTemporaryDrawerOpen}
-        variant={upLg ? 'persistent' : 'temporary'}
+        variant={upLg ? 'permanent' : 'temporary'}
       />
       <Stack component="main" flex={1}>
         <NavBar
-          onMenuClick={() => setTemporaryDrawerOpen(!drawerOpen)}
+          onMenuClick={() => setTemporaryDrawerOpen((v) => !v)}
           showMenuButton={!upLg}
-          noMenuTransition={!upLg}
         />
         <Container
           sx={{
