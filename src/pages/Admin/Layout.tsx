@@ -2,7 +2,6 @@ import {
   Alert,
   Box,
   Button,
-  Card,
   Chip,
   Container,
   IconButton,
@@ -24,7 +23,6 @@ import {
   Drawer,
   drawerClasses,
   DrawerProps,
-  styled,
   useMediaQuery,
   useTheme,
 } from '@mui/material'
@@ -36,38 +34,10 @@ import GroupsIcon from '@mui/icons-material/Groups'
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 import { http } from '../../http'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import { SxProps } from '@mui/joy/styles/types'
 import { usePreferences } from '../../store'
 import shallow from 'zustand/shallow'
 import SettingsIcon from '@mui/icons-material/Settings'
 import PieChartIcon from '@mui/icons-material/PieChart'
-
-const drawerWidth = 0o420
-
-const barBorderStyles: SxProps = (theme) => ({
-  borderColor: theme.vars.palette.neutral.outlinedBorder,
-  borderWidth: '0px 0px thin',
-  borderStyle: 'solid',
-})
-
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
-  open?: boolean
-}>(({ theme, open }) => ({
-  flexGrow: 1,
-  paddingBottom: theme.spacing(3),
-  transition: theme.transitions.create('margin', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  marginLeft: `-${drawerWidth}px`,
-  ...(open && {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  }),
-}))
 
 interface NavBarProps {
   onMenuClick?: IconButtonProps['onClick']
@@ -151,18 +121,20 @@ const NavBar = ({
       sx={(theme) => ({
         height: 0o100,
         px: 2,
-        backdropFilter: 'blur(8px)',
         position: 'sticky',
         top: 0,
         left: 0,
         right: 0,
         zIndex: 100,
 
+        backdropFilter: 'blur(8px)',
         backgroundColor: 'rgba(255, 255, 255, 0.8)',
         [theme.getColorSchemeSelector('dark')]: {
           backgroundColor: `rgba(${theme.vars.palette.neutral.darkChannel} / 0.8)`,
         },
-        ...barBorderStyles(theme),
+        borderColor: theme.vars.palette.neutral.outlinedBorder,
+        borderWidth: '0px 0px thin',
+        borderStyle: 'solid',
       })}
     >
       {noMenuTransition ? (
@@ -270,27 +242,24 @@ const NavDrawerList = () => {
 
       {teacherData && (
         <ListItem>
-          <Card
+          <Stack
             sx={{
-              width: 1,
+              px: 2,
+              py: 1,
             }}
+            spacing={1}
+            alignItems="start"
           >
-            <Stack
-              sx={{
-                pl: 2,
-              }}
-              spacing={1}
-              alignItems="start"
-            >
-              <Stack direction="row" alignItems="baseline" spacing={1}>
-                <Typography fontSize="xl">{teacherData.name}</Typography>
-                <Typography fontSize="xs">{teacherData.phone}</Typography>
-              </Stack>
-              <Chip size="sm">{teacherData.is_admin ? '管理员' : '教师'}</Chip>
+            <Stack direction="row" alignItems="baseline" spacing={1}>
+              <Typography fontSize="xl">{teacherData.name}</Typography>
+              <Typography fontSize="xs">{teacherData.phone}</Typography>
             </Stack>
-          </Card>
+            <Chip size="sm">{teacherData.is_admin ? '管理员' : '教师'}</Chip>
+          </Stack>
         </ListItem>
       )}
+
+      <ListDivider />
 
       {links.map((item) => (
         <ListItem key={item.to}>
@@ -374,6 +343,8 @@ interface NavDrawerProps {
   variant: DrawerProps['variant']
 }
 
+const drawerWidth = 0o420
+
 const NavDrawer = ({ setOpen, open, variant }: NavDrawerProps) => {
   return (
     <Drawer
@@ -398,27 +369,7 @@ const NavDrawer = ({ setOpen, open, variant }: NavDrawerProps) => {
       variant={variant}
       anchor="left"
     >
-      <Stack>
-        <Stack
-          direction="row"
-          alignItems="center"
-          sx={(theme) => ({
-            height: 0o100,
-            px: 2,
-            position: 'sticky',
-            top: 0,
-            zIndex: 1,
-            background: theme.vars.palette.background.body,
-            ...barBorderStyles(theme),
-          })}
-        >
-          <IconButton variant="plain" onClick={() => setOpen(!open)}>
-            <MenuIcon />
-          </IconButton>
-        </Stack>
-
-        <NavDrawerList />
-      </Stack>
+      <NavDrawerList />
     </Drawer>
   )
 }
@@ -428,23 +379,21 @@ export const Layout = () => {
 
   const upLg = useMediaQuery(theme.breakpoints.up('lg'))
 
-  const [drawerOpen, setDrawerOpen] = useState(upLg)
+  const [temporaryDrawerOpen, setTemporaryDrawerOpen] = useState(upLg)
 
-  useEffect(() => {
-    setDrawerOpen(upLg)
-  }, [upLg])
+  const drawerOpen = upLg || temporaryDrawerOpen
 
   return (
     <Stack direction="row">
       <NavDrawer
         open={drawerOpen}
-        setOpen={setDrawerOpen}
+        setOpen={setTemporaryDrawerOpen}
         variant={upLg ? 'persistent' : 'temporary'}
       />
-      <Main open={upLg ? drawerOpen : true}>
+      <Stack component="main" flex={1}>
         <NavBar
-          onMenuClick={() => setDrawerOpen(!drawerOpen)}
-          showMenuButton={!drawerOpen}
+          onMenuClick={() => setTemporaryDrawerOpen(!drawerOpen)}
+          showMenuButton={!upLg}
           noMenuTransition={!upLg}
         />
         <Container
@@ -454,7 +403,7 @@ export const Layout = () => {
         >
           <Outlet />
         </Container>
-      </Main>
+      </Stack>
     </Stack>
   )
 }
