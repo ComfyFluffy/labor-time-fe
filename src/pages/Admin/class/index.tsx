@@ -24,6 +24,7 @@ import { Viewer } from './Viewer'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import EditIcon from '@mui/icons-material/Edit'
 import Autocomplete from '@mui/joy/Autocomplete'
+import { rowOnHover } from '../../../styles'
 
 export type ClassViewParams = {
   classId: string
@@ -165,12 +166,7 @@ const Class = ({ classId }: { classId: number }) => {
                     onClick={() => {
                       setViewerItem(student)
                     }}
-                    sx={(theme) => ({
-                      '&:hover': {
-                        backgroundColor: theme.vars.palette.primary.softBg,
-                      },
-                      transition: 'background-color 0.25s',
-                    })}
+                    sx={rowOnHover}
                   >
                     <TableCell>{student.student_id}</TableCell>
                     <TableCell>{student.name}</TableCell>

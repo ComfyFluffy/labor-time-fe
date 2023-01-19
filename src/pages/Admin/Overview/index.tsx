@@ -4,6 +4,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import { http, ClassesStatsResponse } from '../../../http'
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { rowOnHover } from '../../../styles'
 
 const FlexCenter = styled('div')({
   display: 'flex',
@@ -29,6 +30,7 @@ const Row = ({
       onClick={() => {
         nav(`/admin/class/${row.class.id}`)
       }}
+      sx={rowOnHover}
     >
       <TableCell
         sx={{
@@ -100,15 +102,21 @@ export const Overview = () => {
 
       <Typography level="h3">软件学院</Typography>
 
-      <Stack>
-        <Typography color="success" level="h2">
-          {approvedRate}%
-        </Typography>
-        <Typography color="neutral">已审核</Typography>
-      </Stack>
+      {approvedRate && (
+        <Stack>
+          <Typography color="success" level="h2">
+            {approvedRate}%
+          </Typography>
+          <Typography color="neutral">已审核</Typography>
+        </Stack>
+      )}
 
       <Stack direction="row">
-        <Button startDecorator={<FileDownloadIcon />} color="primary">
+        <Button
+          startDecorator={<FileDownloadIcon />}
+          color="primary"
+          disabled={selectedClassIds.size === 0}
+        >
           导出选择的班级
         </Button>
       </Stack>
