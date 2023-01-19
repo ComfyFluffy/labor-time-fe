@@ -83,6 +83,11 @@ export type ClassesStatsResponse = {
   }
 }[]
 
+export interface SystemState {
+  teacher: boolean
+  student: boolean
+}
+
 export class Http {
   axios: AxiosInstance
 
@@ -298,6 +303,39 @@ export class Http {
     return this.useGet<ClassesStatsResponse>('/v1/teacher/statistics', {
       schoolYear,
     })
+  }
+
+  useStudentSystemState() {
+    const { data, ...rest } = this.useGet<SystemState>(
+      '/v1/student/system/status'
+    )
+    return {
+      data: data && data.student,
+      ...rest,
+    }
+  }
+
+  useSystemState() {
+    return this.useGet<SystemState>('/v1/teacher/system/status')
+  }
+
+  async updateSystemState(userType: UserType, state: boolean) {
+    if (userType === 'teacher') {
+      if (state) {
+        await this.axios.post('/v1/teacher/system/teacher')
+      } else {
+        await this.axios.delete('/v1/teacher/system/teacher')
+      }
+      return
+    }
+
+    if (userType === 'student') {
+      if (state) {
+        await this.axios.post('/v1/teacher/system/student')
+      } else {
+        await this.axios.delete('/v1/teacher/system/student')
+      }
+    }
   }
 
   private checkAxiosError(err: unknown) {
