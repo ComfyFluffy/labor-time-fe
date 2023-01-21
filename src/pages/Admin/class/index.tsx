@@ -61,6 +61,8 @@ const Class = ({ classId }: { classId: number }) => {
 
   const [viewerItem, setViewerItem] = useState<Student | null>(null)
 
+  const [xlsxDownloading, setXlsxDownloading] = useState(false)
+
   const [searchText, setSearchText] = useState('')
   const [stateFilter, setStateFilter] = useState<StudentState | null>(null)
 
@@ -92,10 +94,22 @@ const Class = ({ classId }: { classId: number }) => {
       {className && <Typography level="h4">{className}</Typography>}
 
       <Stack direction="row" spacing={2} alignItems="center">
-        <Button startDecorator={<FileDownloadIcon />} color="primary">
+        <Button
+          startDecorator={<FileDownloadIcon />}
+          color="primary"
+          onClick={async () => {
+            try {
+              setXlsxDownloading(true)
+              await http.toast(http.downloadXlsxByClassIds([classId]), '下载')
+            } finally {
+              setXlsxDownloading(false)
+            }
+          }}
+          disabled={!data || xlsxDownloading}
+        >
           导出表格
         </Button>
-        <Button startDecorator={<EditIcon />} color="success">
+        <Button startDecorator={<EditIcon />} color="success" disabled={!data}>
           添加学生
         </Button>
       </Stack>

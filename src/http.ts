@@ -4,6 +4,7 @@ import { usePreferences } from './store'
 import useSWR from 'swr'
 import { toast } from 'react-toastify'
 import imageCompression from 'browser-image-compression'
+import fileDownload from 'js-file-download'
 
 export type UserType = 'student' | 'teacher'
 
@@ -87,6 +88,9 @@ export interface SystemState {
   teacher: boolean
   student: boolean
 }
+
+const defaultSchoolYear = () =>
+  usePreferences.getState().selectedSchoolYear || undefined
 
 export class Http {
   axios: AxiosInstance
@@ -210,7 +214,7 @@ export class Http {
     return this.useGet<TeacherWithClasses>('/v1/teacher/info/self')
   }
 
-  useClasses(schoolYear?: string) {
+  useClasses(schoolYear = defaultSchoolYear()) {
     return this.useGet<Class[]>('/v1/teacher/class', {
       'school-year': schoolYear,
     })
@@ -244,7 +248,7 @@ export class Http {
     )
   }
 
-  useTeachers(schoolYear?: string) {
+  useTeachers(schoolYear = defaultSchoolYear()) {
     return this.useGet<TeacherWithClasses[]>('/v1/teacher/class2teacher', {
       'school-year': schoolYear,
     })
@@ -299,7 +303,7 @@ export class Http {
     )
   }
 
-  useClassesStats(schoolYear?: string) {
+  useClassesStats(schoolYear = defaultSchoolYear()) {
     return this.useGet<ClassesStatsResponse>('/v1/teacher/statistics', {
       schoolYear,
     })
@@ -336,6 +340,31 @@ export class Http {
         await this.axios.delete('/v1/teacher/system/student')
       }
     }
+  }
+
+  async downloadXlsxByClassIds(
+    classIds: number[],
+    schoolYear = defaultSchoolYear()
+  ) {
+    if (!schoolYear) {
+      throw new Error('schoolYear is required')
+    }
+    const r = await this.axios.post(
+      `/v1/teacher/statistics?${new URLSearchParams({
+        'school-year': schoolYear,
+      })}`,
+      classIds,
+      {
+        responseType: 'blob',
+      }
+    )
+    fileDownload(
+      r.data,
+      `学生信息-${schoolYear}-${new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace('T', '-')}.xlsx`
+    )
   }
 
   private checkAxiosError(err: unknown) {

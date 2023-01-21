@@ -66,6 +66,8 @@ export const Overview = () => {
     new Set()
   )
 
+  const [xlsxDownloading, setXlsxDownloading] = useState(false)
+
   const { data, error } = http.useClassesStats()
 
   const approvedRate = useMemo(() => {
@@ -115,7 +117,18 @@ export const Overview = () => {
         <Button
           startDecorator={<FileDownloadIcon />}
           color="primary"
-          disabled={selectedClassIds.size === 0}
+          disabled={selectedClassIds.size === 0 || xlsxDownloading}
+          onClick={async () => {
+            try {
+              setXlsxDownloading(true)
+              await http.toast(
+                http.downloadXlsxByClassIds([...selectedClassIds]),
+                '下载'
+              )
+            } finally {
+              setXlsxDownloading(false)
+            }
+          }}
         >
           导出选择的班级
         </Button>
