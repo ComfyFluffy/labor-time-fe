@@ -15,7 +15,6 @@ export default function LoadingWrapper({ children }: LoadingWrapperProps) {
             justifyContent: 'center',
             alignItems: 'center',
             height: '80vh',
-            backgroundColor: 'rgba(0, 0, 0, 0)',
           }}
         >
           <CircularProgress />
