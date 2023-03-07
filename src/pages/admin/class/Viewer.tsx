@@ -11,14 +11,14 @@ import {
 } from '@mui/joy'
 import { useMediaQuery } from '@mui/material'
 import { Student } from '../../../model'
-import { ItemEditor } from '../../Student/Editor'
+import { ItemEditor } from '../../student/Editor'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 import UndoIcon from '@mui/icons-material/Undo'
-import { StudentInfo } from '../../../components/StudentInfo'
+import StudentInfo from '../../../components/StudentInfo'
 import Autocomplete from '@mui/joy/Autocomplete'
 import { useState } from 'react'
-import { http } from '../../../http'
+import { service } from '../../../service'
 
 const AskReason = ({
   onClose,
@@ -85,7 +85,9 @@ export const Viewer = ({
   const [askReasonOpen, setAskReasonOpen] = useState(false)
   const [reasonItemId, setReasonItemId] = useState<number | null>(null)
 
-  const { data, error, mutate } = http.useStudentCategories(student.student_id)
+  const { data, error, mutate } = service.useStudentCategories(
+    student.student_id
+  )
 
   return (
     <>
@@ -162,8 +164,8 @@ export const Viewer = ({
                                 color="success"
                                 variant="soft"
                                 onClick={async () => {
-                                  await http.toastOnError(
-                                    http.passItem(item.id)
+                                  await service.toastOnError(
+                                    service.passItem(item.id)
                                   )
                                   mutate()
                                 }}
@@ -191,8 +193,8 @@ export const Viewer = ({
                                 color="warning"
                                 variant="soft"
                                 onClick={async () => {
-                                  await http.toastOnError(
-                                    http.setItemPending(item.id)
+                                  await service.toastOnError(
+                                    service.setItemPending(item.id)
                                   )
                                   mutate()
                                 }}
@@ -219,7 +221,9 @@ export const Viewer = ({
 
       <AskReason
         onSubmit={async (reason) => {
-          await http.toastOnError(http.rejectItem(reasonItemId!, reason || ''))
+          await service.toastOnError(
+            service.rejectItem(reasonItemId!, reason || '')
+          )
           mutate()
           setAskReasonOpen(false)
         }}

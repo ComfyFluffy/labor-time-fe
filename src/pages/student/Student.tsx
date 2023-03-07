@@ -15,10 +15,10 @@ import PublishIcon from '@mui/icons-material/Publish'
 import { useMemo, useState } from 'react'
 import produce from 'immer'
 import { usePreferences } from '../../store'
-import shallow from 'zustand/shallow'
-import { StudentInfo } from '../../components/StudentInfo'
-import { AddItemRequest, http, UpdateItemRequest } from '../../http'
+import { shallow } from 'zustand/shallow'
+import { AddItemRequest, service, UpdateItemRequest } from '../../service'
 import { Me } from './Me'
+import StudentInfo from '../../components/StudentInfo'
 
 let itemLocalId = 0
 
@@ -46,7 +46,7 @@ const ConfirmPersonalInfo = () => {
     shallow
   )
 
-  const { data, error } = http.useStudentSelf()
+  const { data, error } = service.useStudentSelf()
 
   return (
     <Modal open={!personalInfoConfirmed}>
@@ -69,7 +69,7 @@ const ConfirmPersonalInfo = () => {
   )
 }
 
-export const Student = () => {
+export default function Student() {
   const [currentItemIndex, setCurrentItemIndex] = useState(0)
 
   const emptyItemsActions = () =>
@@ -84,7 +84,7 @@ export const Student = () => {
     })
   const [itemsActions, setItemsActions] = useState(emptyItemsActions)
 
-  const { data: categories, error, mutate } = http.useCategories()
+  const { data: categories, error, mutate } = service.useCategories()
 
   const localCategories: CategoryWithNewItem[] | undefined = useMemo(
     () =>
@@ -112,7 +112,7 @@ export const Student = () => {
   )
 
   const onSubmit = () => {
-    http.toast(async () => {
+    service.toast(async () => {
       const addedItems: AddItemRequest = Array.from(
         itemsActions.added.values()
       ).map((item) => ({
@@ -135,7 +135,7 @@ export const Student = () => {
       }))
       const removedIds = Array.from(itemsActions.removedIds.values())
 
-      await http.updateItems(addedItems, updatedItems, removedIds)
+      await service.updateItems(addedItems, updatedItems, removedIds)
       setItemsActions(emptyItemsActions())
       mutate()
     })

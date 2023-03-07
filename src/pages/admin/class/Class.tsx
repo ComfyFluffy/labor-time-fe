@@ -3,8 +3,8 @@ import {
   Button,
   Chip,
   ColorPaletteProp,
+  Input,
   Stack,
-  TextField,
   Typography,
   useTheme,
 } from '@mui/joy'
@@ -18,7 +18,7 @@ import {
 } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { http } from '../../../http'
+import { service } from '../../../service'
 import { Student, StudentState, studentStates } from '../../../model'
 import { Viewer } from './Viewer'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
@@ -55,9 +55,9 @@ const studentStateDisplay: Record<
   },
 }
 
-const Class = ({ classId }: { classId: number }) => {
-  const { data, error, mutate } = http.useClassStudents(classId)
-  const { data: classesData } = http.useClasses()
+const ClassWithArg = ({ classId }: { classId: number }) => {
+  const { data, error, mutate } = service.useClassStudents(classId)
+  const { data: classesData } = service.useClasses()
 
   const [viewerItem, setViewerItem] = useState<Student | null>(null)
 
@@ -100,7 +100,10 @@ const Class = ({ classId }: { classId: number }) => {
           onClick={async () => {
             try {
               setXlsxDownloading(true)
-              await http.toast(http.downloadXlsxByClassIds([classId]), '下载')
+              await service.toast(
+                service.downloadXlsxByClassIds([classId]),
+                '下载'
+              )
             } finally {
               setXlsxDownloading(false)
             }
@@ -119,7 +122,7 @@ const Class = ({ classId }: { classId: number }) => {
         spacing={2}
         alignItems={upSm ? 'end' : undefined}
       >
-        <TextField
+        <Input
           placeholder="学号 / 姓名"
           value={searchText}
           onChange={(e) => {
@@ -212,7 +215,7 @@ const Class = ({ classId }: { classId: number }) => {
   )
 }
 
-export const ClassPage = () => {
+export default function Class() {
   const { classId } = useParams<ClassViewParams>()
   const classIdNumber = classId !== undefined ? parseInt(classId) : undefined
   if (classIdNumber === undefined) {
@@ -221,5 +224,5 @@ export const ClassPage = () => {
   if (Number.isNaN(classIdNumber)) {
     return <Typography>班级 ID {classId} 不合法</Typography>
   }
-  return <Class classId={classIdNumber} />
+  return <ClassWithArg classId={classIdNumber} />
 }

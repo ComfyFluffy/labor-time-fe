@@ -7,10 +7,10 @@ import {
   Switch,
   Typography,
 } from '@mui/joy'
-import { http } from '../../../http'
+import { service } from '../../../service'
 
-const SystemManage = () => {
-  const { data, mutate } = http.useSystemState()
+export default function SystemManagement() {
+  const { data, mutate } = service.useSystemState()
   return (
     <Stack
       spacing={2}
@@ -35,8 +35,8 @@ const SystemManage = () => {
               checked={data.student}
               color={data.student ? 'success' : 'neutral'}
               onChange={async (e) => {
-                await http.toastOnError(
-                  http.updateSystemState('student', e.target.checked)
+                await service.toastOnError(
+                  service.updateSystemState('student', e.target.checked)
                 )
                 mutate({
                   ...data,
@@ -59,8 +59,8 @@ const SystemManage = () => {
               checked={data.teacher}
               color={data.teacher ? 'success' : 'neutral'}
               onChange={async (e) => {
-                await http.toastOnError(
-                  http.updateSystemState('teacher', e.target.checked)
+                await service.toastOnError(
+                  service.updateSystemState('teacher', e.target.checked)
                 )
                 mutate({
                   ...data,
@@ -74,5 +74,3 @@ const SystemManage = () => {
     </Stack>
   )
 }
-
-export default SystemManage

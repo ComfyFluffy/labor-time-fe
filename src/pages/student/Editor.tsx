@@ -4,13 +4,15 @@ import {
   Box,
   Button,
   Card,
+  FormControl,
+  FormLabel,
   formLabelClasses,
   IconButton,
+  Input,
   inputClasses,
   Sheet,
   Stack,
   styled,
-  TextField,
   Theme,
   Typography,
   typographyClasses,
@@ -29,17 +31,17 @@ import AddIcon from '@mui/icons-material/Add'
 import PendingIcon from '@mui/icons-material/Pending'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { CategoryExplanation, Item, ItemState } from '../../model'
-import { CategoryWithNewItem, NewItem } from '.'
 import { ReactNode, useMemo, useState } from 'react'
 import ImageViewer from 'react-simple-image-viewer'
-import { http } from '../../http'
+import { service } from '../../service'
+import { CategoryWithNewItem, NewItem } from './Student'
 
 const transparentBackground = (theme: Theme) =>
   theme.palette.mode === 'dark'
     ? alpha(theme.palette.common.black, 0.8)
     : alpha(theme.palette.common.white, 0.8)
 
-const StyledTextField = styled(TextField)(({ theme, color }) => ({
+const StyledInput = styled(Input)(({ theme, color }) => ({
   [`& .${inputClasses.disabled}`]: {
     color: theme.vars.palette[color!]?.outlinedColor,
   },
@@ -48,6 +50,20 @@ const StyledTextField = styled(TextField)(({ theme, color }) => ({
     color: theme.vars.palette.text.secondary,
   },
 }))
+
+const InputWithLabel = ({
+  label,
+  ...props
+}: {
+  label: string
+} & React.ComponentProps<typeof Input>) => {
+  return (
+    <FormControl>
+      <FormLabel>{label}</FormLabel>
+      <StyledInput {...props} />
+    </FormControl>
+  )
+}
 
 const UploadButton = ({ onUpload }: { onUpload: (file: File) => void }) => {
   return (
@@ -332,7 +348,7 @@ export const ItemEditor = ({
           )}
         </Stack>
 
-        <StyledTextField
+        <InputWithLabel
           label="事项"
           disabled={!itemEditable}
           variant="outlined"
@@ -342,7 +358,7 @@ export const ItemEditor = ({
             onChange && onChange({ ...item, description: e.target.value })
           }
         />
-        <StyledTextField
+        <InputWithLabel
           label="学时"
           type="number"
           variant="outlined"
@@ -384,8 +400,8 @@ export const ItemEditor = ({
             <Grid xs={1}>
               <UploadButton
                 onUpload={(file) => {
-                  http.toast(async () => {
-                    const url = await http.uploadImage(file)
+                  service.toast(async () => {
+                    const url = await service.uploadImage(file)
                     onChange &&
                       onChange({
                         ...item,

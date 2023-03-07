@@ -32,10 +32,10 @@ import { Outlet, useMatch, useNavigate } from 'react-router-dom'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import GroupsIcon from '@mui/icons-material/Groups'
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
-import { http } from '../../http'
+import { service } from '../../service'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { usePreferences } from '../../store'
-import shallow from 'zustand/shallow'
+import { shallow } from 'zustand/shallow'
 import SettingsIcon from '@mui/icons-material/Settings'
 import PieChartIcon from '@mui/icons-material/PieChart'
 
@@ -45,7 +45,7 @@ interface NavBarProps {
 }
 
 const SchoolYearSwitcher = () => {
-  const { data } = http.useSchoolYears()
+  const { data } = service.useSchoolYears()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const [selectedSchoolYear, setSelectedSchoolYear] = usePreferences(
@@ -99,7 +99,7 @@ const SchoolYearSwitcher = () => {
 }
 
 const NavBar = ({ onMenuClick, showMenuButton }: NavBarProps) => {
-  const { data } = http.useTeacherInfo()
+  const { data } = service.useTeacherInfo()
 
   return (
     <Stack
@@ -135,7 +135,7 @@ const NavBar = ({ onMenuClick, showMenuButton }: NavBarProps) => {
       <Box sx={{ flexGrow: 1 }} />
       <Stack direction="row" alignItems="center" spacing={1}>
         {data && <Typography color="neutral">{data.name}</Typography>}
-        <Button onClick={() => http.logout()} variant="soft" color="neutral">
+        <Button onClick={() => service.logout()} variant="soft" color="neutral">
           登出
         </Button>
       </Stack>
@@ -173,8 +173,8 @@ const NavDrawerList = () => {
     (state) => [state.classListOpen, state.setClassListOpen],
     shallow
   )
-  const { data: teacherData, error: teacherError } = http.useTeacherInfo()
-  const { data: classesData, error: classesError } = http.useClasses()
+  const { data: teacherData, error: teacherError } = service.useTeacherInfo()
+  const { data: classesData, error: classesError } = service.useClasses()
   const nav = useNavigate()
 
   const classRouteMatch = useMatch('/admin/class/:classId')
@@ -353,7 +353,7 @@ const NavDrawer = ({ setOpen, open, variant }: NavDrawerProps) => {
   )
 }
 
-export const Layout = () => {
+export default function Layout() {
   const theme = useTheme()
 
   const upLg = useMediaQuery(theme.breakpoints.up('lg'))

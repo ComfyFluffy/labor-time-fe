@@ -1,7 +1,7 @@
 import { Stack, Typography } from '@mui/joy'
 import { Student } from '../model'
 
-export const StudentInfo = ({ student }: { student: Student }) => {
+export default function StudentInfo({ student }: { student: Student }) {
   return (
     <Stack direction="row" spacing={2}>
       <Stack>

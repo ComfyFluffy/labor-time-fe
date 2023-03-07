@@ -4,12 +4,14 @@ import {
   Button,
   Chip,
   Divider,
+  FormControl,
+  FormLabel,
   IconButton,
+  Input,
   Modal,
   ModalDialog,
   Stack,
   Switch,
-  TextField,
   Typography,
 } from '@mui/joy'
 import {
@@ -22,7 +24,7 @@ import {
   TableRow,
 } from '@mui/material'
 import { useMemo, useState } from 'react'
-import { http, TeacherWithClasses } from '../../../http'
+import { service, TeacherWithClasses } from '../../../service'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import RemoveIcon from '@mui/icons-material/Remove'
 import AddIcon from '@mui/icons-material/Add'
@@ -39,7 +41,7 @@ const ClassesAutocomplete = ({
   onAdd: (value: Class) => void
   selectedClasses: Class[]
 }) => {
-  const { data, isLoading } = http.useClasses()
+  const { data, isLoading } = service.useClasses()
   const [value, setValue] = useState<Class | null>(null)
 
   const filteredClasses = useMemo(() => {
@@ -181,29 +183,29 @@ const TeacherEditor = ({
     try {
       let id = teacher.id
       if (isNew) {
-        await http.toast(async () => {
-          id = await http.addTeacher({
+        await service.toast(async () => {
+          id = await service.addTeacher({
             name: editingState.name,
             phone: editingState.phone,
             is_admin: editingState.is_admin,
           })
-          await http.addTeacherClassRelations(
+          await service.addTeacherClassRelations(
             id,
             Array.from(addedClasses.keys())
           )
         })
       } else {
-        await http.toast(
+        await service.toast(
           Promise.all([
-            http.updateTeacher({
+            service.updateTeacher({
               id: teacher.id,
               ...editingState,
             }),
-            http.addTeacherClassRelations(
+            service.addTeacherClassRelations(
               teacher.id,
               Array.from(addedClasses.keys())
             ),
-            http.deleteTeacherClassRelations(
+            service.deleteTeacherClassRelations(
               teacher.id,
               Array.from(removedClassIds)
             ),
@@ -226,7 +228,7 @@ const TeacherEditor = ({
 
   const handleDelete = async () => {
     try {
-      await http.toastOnError(http.deleteTeacher(teacher.id))
+      await service.toastOnError(service.deleteTeacher(teacher.id))
     } finally {
       onMutated()
     }
@@ -237,26 +239,32 @@ const TeacherEditor = ({
       <Stack sx={{ maxWidth: 0o400 }} spacing={1}>
         <Typography level="h6">基本信息</Typography>
 
-        <TextField
-          label="姓名"
-          value={editingState.name}
-          onChange={(e) => {
-            setEditingState((prev) => ({
-              ...prev,
-              name: e.target.value,
-            }))
-          }}
-        />
-        <TextField
-          label="手机号码"
-          value={editingState.phone}
-          onChange={(e) => {
-            setEditingState((prev) => ({
-              ...prev,
-              phone: e.target.value,
-            }))
-          }}
-        />
+        <FormControl>
+          <FormLabel>姓名</FormLabel>
+          <Input
+            value={editingState.name}
+            onChange={(e) => {
+              setEditingState((prev) => ({
+                ...prev,
+                name: e.target.value,
+              }))
+            }}
+          />
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>手机号码</FormLabel>
+          <Input
+            value={editingState.phone}
+            onChange={(e) => {
+              setEditingState((prev) => ({
+                ...prev,
+                phone: e.target.value,
+              }))
+            }}
+          />
+        </FormControl>
+
         <Stack direction="row">
           <Typography flex={1}>管理员</Typography>
           <Switch
@@ -415,8 +423,8 @@ const TeacherRow = ({
   )
 }
 
-const UserManage = () => {
-  const { data, error, mutate } = http.useTeachers()
+export default function UserManagement() {
+  const { data, error, mutate } = service.useTeachers()
   const [addedTeacher, setAddedTeacher] = useState<TeacherWithClasses | null>(
     null
   )
@@ -502,5 +510,3 @@ const UserManage = () => {
     </Stack>
   )
 }
-
-export default UserManage

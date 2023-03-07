@@ -92,7 +92,7 @@ export interface SystemState {
 const defaultSchoolYear = () =>
   usePreferences.getState().selectedSchoolYear || undefined
 
-export class Http {
+export class Service {
   axios: AxiosInstance
 
   constructor() {
@@ -405,4 +405,4 @@ export class Http {
   }
 }
 
-export const http = new Http()
+export const service = new Service()

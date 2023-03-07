@@ -11,6 +11,7 @@ export const App = () => {
       <CssBaseline />
 
       <RouterProvider router={router} />
+
       <ToastContainer theme={colorScheme === 'dark' ? 'colored' : 'light'} />
     </>
   )

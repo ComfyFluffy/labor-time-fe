@@ -1,6 +1,6 @@
-import create from 'zustand'
+import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { UserType } from './http'
+import { UserType } from './service'
 
 export interface PreferencesStore {
   personalInfoConfirmed: boolean

@@ -1,7 +1,7 @@
 import { Alert, Button, Checkbox, Stack, styled, Typography } from '@mui/joy'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
-import { http, ClassesStatsResponse } from '../../../http'
+import { service, ClassesStatsResponse } from '../../../service'
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { rowOnHover } from '../../../styles'
@@ -61,14 +61,14 @@ const Row = ({
   )
 }
 
-export const Overview = () => {
+export default function Overview() {
   const [selectedClassIds, setSelectedClassIds] = useState<Set<number>>(
     new Set()
   )
 
   const [xlsxDownloading, setXlsxDownloading] = useState(false)
 
-  const { data, error } = http.useClassesStats()
+  const { data, error } = service.useClassesStats()
 
   const approvedRate = useMemo(() => {
     if (!data) {
@@ -121,8 +121,8 @@ export const Overview = () => {
           onClick={async () => {
             try {
               setXlsxDownloading(true)
-              await http.toast(
-                http.downloadXlsxByClassIds([...selectedClassIds]),
+              await service.toast(
+                service.downloadXlsxByClassIds([...selectedClassIds]),
                 '下载'
               )
             } finally {

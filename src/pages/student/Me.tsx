@@ -1,8 +1,8 @@
 import { Button, Stack, Typography } from '@mui/joy'
-import { http } from '../../http'
+import { service } from '../../service'
 
 export const Me = () => {
-  const { data } = http.useStudentSelf()
+  const { data } = service.useStudentSelf()
 
   return (
     <Stack direction="row" justifyContent="end" alignItems="center" spacing={2}>
@@ -17,7 +17,7 @@ export const Me = () => {
           <Typography color="neutral">{data.student_id}</Typography>
         </Stack>
       )}
-      <Button onClick={() => http.logout()} variant="soft" color="neutral">
+      <Button onClick={() => service.logout()} variant="soft" color="neutral">
         登出
       </Button>
     </Stack>
