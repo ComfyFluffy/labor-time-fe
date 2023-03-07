@@ -189,13 +189,13 @@ const NavDrawerList = () => {
 
   const adminLinks: NavListButtonProps[] = [
     {
-      to: '/admin/user-manage',
+      to: '/admin/user-management',
       title: '教师用户管理',
       Icon: SupervisorAccountIcon,
     },
 
     {
-      to: '/admin/system-manage',
+      to: '/admin/system-management',
       title: '系统管理',
       Icon: SettingsIcon,
     },
