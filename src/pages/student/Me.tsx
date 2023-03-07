@@ -1,5 +1,5 @@
 import { Button, Stack, Typography } from '@mui/joy'
-import { service } from '../../service'
+import { service } from '../../services/service'
 
 export const Me = () => {
   const { data } = service.useStudentSelf()

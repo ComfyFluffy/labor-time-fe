@@ -10,30 +10,34 @@ import {
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import { Editor } from './Editor'
-import { Category, Item } from '../../model'
+import { Category, LaborItem } from '../../services/model'
 import PublishIcon from '@mui/icons-material/Publish'
 import { useMemo, useState } from 'react'
 import produce from 'immer'
 import { usePreferences } from '../../store'
 import { shallow } from 'zustand/shallow'
-import { AddItemRequest, service, UpdateItemRequest } from '../../service'
+import {
+  AddItemRequest,
+  service,
+  UpdateItemRequest,
+} from '../../services/service'
 import { Me } from './Me'
 import StudentInfo from '../../components/StudentInfo'
 
 let itemLocalId = 0
 
 export type NewItem = Pick<
-  Item,
+  LaborItem,
   'description' | 'picture_urls' | 'duration_hour'
 > & {
   local_id: number
   category_id: number
 }
 export type CategoryWithNewItem = Omit<Category, 'items'> & {
-  items: (NewItem | Item)[]
+  items: (NewItem | LaborItem)[]
 }
 type UpdateItem = Pick<
-  Item,
+  LaborItem,
   'id' | 'description' | 'duration_hour' | 'picture_urls'
 >
 

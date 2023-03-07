@@ -7,7 +7,7 @@ import {
   Switch,
   Typography,
 } from '@mui/joy'
-import { service } from '../../../service'
+import { service } from '../../../services/service'
 
 export default function SystemManagement() {
   const { data, mutate } = service.useSystemState()

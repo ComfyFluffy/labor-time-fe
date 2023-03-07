@@ -14,7 +14,7 @@ import { AxiosError } from 'axios'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import LoginBackground from '../../components/LoginBackground'
-import { service, UserType } from '../../service'
+import { service, UserType } from '../../services/service'
 
 export default function Login() {
   const [credentials, setCredentials] = useState({

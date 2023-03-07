@@ -10,7 +10,7 @@ import {
   useTheme,
 } from '@mui/joy'
 import { useMediaQuery } from '@mui/material'
-import { Student } from '../../../model'
+import { Student } from '../../../services/model'
 import { ItemEditor } from '../../student/Editor'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
@@ -18,7 +18,7 @@ import UndoIcon from '@mui/icons-material/Undo'
 import StudentInfo from '../../../components/StudentInfo'
 import Autocomplete from '@mui/joy/Autocomplete'
 import { useState } from 'react'
-import { service } from '../../../service'
+import { service } from '../../../services/service'
 
 const AskReason = ({
   onClose,

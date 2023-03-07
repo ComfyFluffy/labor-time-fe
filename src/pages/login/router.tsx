@@ -1,4 +1,4 @@
-import { makeLazy } from '../../utils'
+import { makeLazy } from '../../utils/lazy'
 
 const Login = makeLazy(() => import('./Login'))
 

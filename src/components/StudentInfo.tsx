@@ -1,5 +1,5 @@
 import { Stack, Typography } from '@mui/joy'
-import { Student } from '../model'
+import { Student } from '../services/model'
 
 export default function StudentInfo({ student }: { student: Student }) {
   return (

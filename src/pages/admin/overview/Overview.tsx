@@ -1,7 +1,7 @@
 import { Alert, Button, Checkbox, Stack, styled, Typography } from '@mui/joy'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
-import { service, ClassesStatsResponse } from '../../../service'
+import { service, ClassesStatsResponse } from '../../../services/service'
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { rowOnHover } from '../../../styles'

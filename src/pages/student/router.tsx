@@ -1,4 +1,4 @@
-import { makeLazy } from '../../utils'
+import { makeLazy } from '../../utils/lazy'
 
 const Student = makeLazy(() => import('./Student'))
 

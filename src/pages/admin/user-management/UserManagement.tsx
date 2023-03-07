@@ -24,7 +24,7 @@ import {
   TableRow,
 } from '@mui/material'
 import { useMemo, useState } from 'react'
-import { service, TeacherWithClasses } from '../../../service'
+import { service, TeacherWithClasses } from '../../../services/service'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import RemoveIcon from '@mui/icons-material/Remove'
 import AddIcon from '@mui/icons-material/Add'
@@ -32,7 +32,7 @@ import Autocomplete from '@mui/joy/Autocomplete'
 import SaveIcon from '@mui/icons-material/Save'
 import DeleteIcon from '@mui/icons-material/Delete'
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded'
-import { Class } from '../../../model'
+import { Class } from '../../../services/model'
 
 const ClassesAutocomplete = ({
   onAdd,

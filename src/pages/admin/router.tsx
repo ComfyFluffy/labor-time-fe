@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import { makeLazy } from '../../utils'
+import { makeLazy } from '../../utils/lazy'
 
 const Layout = makeLazy(() => import('./Layout'))
 const Overview = makeLazy(() => import('./overview/Overview'))
@@ -12,7 +12,7 @@ const SystemManagement = makeLazy(
 )
 
 export const adminRoute = () => ({
-  path: '/admin',
+  path: 'admin',
   element: <Layout />,
   children: [
     { path: '', element: <Navigate to="overview" replace /> },

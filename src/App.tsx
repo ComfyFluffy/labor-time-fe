@@ -1,7 +1,7 @@
 import { CssBaseline, useColorScheme } from '@mui/joy'
 import { RouterProvider } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
-import { router } from './router'
+import { rootRouter } from './pages/router'
 
 export const App = () => {
   const { colorScheme } = useColorScheme()
@@ -10,7 +10,7 @@ export const App = () => {
     <>
       <CssBaseline />
 
-      <RouterProvider router={router} />
+      <RouterProvider router={rootRouter} />
 
       <ToastContainer theme={colorScheme === 'dark' ? 'colored' : 'light'} />
     </>

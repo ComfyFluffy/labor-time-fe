@@ -1,5 +1,5 @@
 import { ComponentType, ComponentProps, lazy } from 'react'
-import LoadingWrapper from './components/LoadingWrapper'
+import LoadingWrapper from '../components/LoadingWrapper'
 
 export const makeLazy = <T extends ComponentType<any>>(
   factory: () => Promise<{ default: T }>

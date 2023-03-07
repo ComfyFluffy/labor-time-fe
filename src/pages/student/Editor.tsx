@@ -30,10 +30,14 @@ import CloseIcon from '@mui/icons-material/Close'
 import AddIcon from '@mui/icons-material/Add'
 import PendingIcon from '@mui/icons-material/Pending'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { CategoryExplanation, Item, ItemState } from '../../model'
+import {
+  CategoryExplanation,
+  LaborItem,
+  LaborItemState,
+} from '../../services/model'
 import { ReactNode, useMemo, useState } from 'react'
 import ImageViewer from 'react-simple-image-viewer'
-import { service } from '../../service'
+import { service } from '../../services/service'
 import { CategoryWithNewItem, NewItem } from './Student'
 
 const transparentBackground = (theme: Theme) =>
@@ -220,10 +224,10 @@ export const ItemEditor = ({
   viewMode,
   action,
 }: {
-  item: Item | NewItem
+  item: LaborItem | NewItem
   editable?: boolean
-  onRemove?: (item: Item | NewItem) => void
-  onChange?: (item: Item | NewItem) => void
+  onRemove?: (item: LaborItem | NewItem) => void
+  onChange?: (item: LaborItem | NewItem) => void
   viewMode?: boolean
   action?: ReactNode
 }) => {
@@ -236,7 +240,7 @@ export const ItemEditor = ({
 
   const stateAlert: Partial<
     Record<
-      ItemState,
+      LaborItemState,
       {
         color: AlertProps['color']
         Icon: React.ComponentType
@@ -431,8 +435,8 @@ export const ItemEditor = ({
 export interface EditorProps {
   category: CategoryWithNewItem
   onAddItem: () => void
-  onRemoveItem: (item: Item | NewItem) => void
-  onUpdateItem: (item: Item | NewItem) => void
+  onRemoveItem: (item: LaborItem | NewItem) => void
+  onUpdateItem: (item: LaborItem | NewItem) => void
 }
 
 export const Editor = ({
