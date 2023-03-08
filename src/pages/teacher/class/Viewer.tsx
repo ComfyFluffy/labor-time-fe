@@ -19,6 +19,7 @@ import { useState } from 'react'
 import { service } from '../../../services/service'
 import { toastOnError } from '../../../utils/toast'
 import ItemEditor from '../../../components/ItemEditor'
+import { usePreferences } from '../../../utils/store'
 
 const AskReason = ({
   onClose,
@@ -85,8 +86,11 @@ export const Viewer = ({
   const [askReasonOpen, setAskReasonOpen] = useState(false)
   const [reasonItemId, setReasonItemId] = useState<number | null>(null)
 
+  const selectedSchoolYear = usePreferences((state) => state.selectedSchoolYear)
+
   const { data, error, mutate } = service.teacher.useStudentLaborItems(
-    student.uid
+    student.id,
+    selectedSchoolYear
   )
 
   return (

@@ -1,14 +1,5 @@
 import { CheckCircle, Error, Pending, Remove } from '@mui/icons-material'
-import {
-  Alert,
-  AlertProps,
-  Box,
-  Card,
-  IconButton,
-  Stack,
-  Typography,
-  typographyClasses,
-} from '@mui/joy'
+import { Box, Card, IconButton, Stack, Theme, Typography } from '@mui/joy'
 import { darken, lighten } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { Unstable_Grid2 as Grid } from '@mui/material'
@@ -21,11 +12,12 @@ import { service } from '../../services/service'
 import { toastProcess } from '../../utils/toast'
 import UploadButton from './UploadButton'
 import ImageViewer from './ImageViewer'
+import StateAlert, { StateAlertProps } from './StateAlert'
 
 export interface ItemEditorProps {
   item: LaborItem | NewLaborItem
-  onRemove: (item: LaborItem | NewLaborItem) => void
-  onChange: (item: LaborItem | NewLaborItem) => void
+  onRemove?: (item: LaborItem | NewLaborItem) => void
+  onChange?: (item: LaborItem | NewLaborItem) => void
   viewMode?: boolean
   action?: ReactNode
 }
@@ -46,17 +38,7 @@ export default function ItemEditor({
   const itemEditable =
     editable && (!('state' in item) || item.state === 'rejected')
 
-  const stateAlert: Partial<
-    Record<
-      LaborItemState,
-      {
-        color: AlertProps['color']
-        Icon: React.ComponentType
-        title: string
-        reason?: string
-      }
-    >
-  > = {
+  const stateAlert: Partial<Record<LaborItemState, StateAlertProps>> = {
     approved: {
       color: 'success',
       Icon: CheckCircle,
@@ -85,35 +67,35 @@ export default function ItemEditor({
   const currentAlert = ('state' in item && stateAlert[item.state]) || undefined
   const image_evidence_urls = item.evidence_urls.filter(isImageUrl)
 
+  const cardStyle = (theme: Theme) => {
+    const isDark = theme.palette.mode === 'dark'
+
+    const primary = isDark
+      ? darken(theme.palette.primary[900], 0.6)
+      : theme.palette.primary[50]
+
+    const backgrounds = {
+      approved: isDark
+        ? darken(theme.palette.success[900], 0.6)
+        : theme.palette.success[50],
+
+      rejected: isDark
+        ? darken(theme.palette.danger[900], 0.6)
+        : theme.palette.danger[50],
+
+      pending: viewMode
+        ? primary
+        : isDark
+        ? darken(theme.palette.warning[900], 0.6)
+        : lighten(theme.palette.warning[50], 0.8),
+    }
+    return {
+      background: 'state' in item ? backgrounds[item.state] : primary,
+    }
+  }
+
   return (
-    <Card
-      sx={(theme) => {
-        const isDark = theme.palette.mode === 'dark'
-
-        const primary = isDark
-          ? darken(theme.palette.primary[900], 0.6)
-          : theme.palette.primary[50]
-
-        const backgrounds = {
-          approved: isDark
-            ? darken(theme.palette.success[900], 0.6)
-            : theme.palette.success[50],
-
-          rejected: isDark
-            ? darken(theme.palette.danger[900], 0.6)
-            : theme.palette.danger[50],
-
-          pending: viewMode
-            ? primary
-            : isDark
-            ? darken(theme.palette.warning[900], 0.6)
-            : lighten(theme.palette.warning[50], 0.8),
-        }
-        return {
-          background: 'state' in item ? backgrounds[item.state] : primary,
-        }
-      }}
-    >
+    <Card sx={cardStyle}>
       <Stack spacing={1}>
         <Stack
           direction="row"
@@ -123,25 +105,7 @@ export default function ItemEditor({
           }}
         >
           {currentAlert ? (
-            <Alert
-              color={currentAlert.color}
-              startDecorator={<currentAlert.Icon />}
-              variant="plain"
-              sx={{ p: 1, flex: 1 }}
-            >
-              <Box
-                sx={{
-                  [`& .${typographyClasses.root}`]: {
-                    color: 'inherit',
-                  },
-                }}
-              >
-                <Typography>{currentAlert.title}</Typography>
-                {currentAlert.reason && (
-                  <Typography fontSize="sm">{currentAlert.reason}</Typography>
-                )}
-              </Box>
-            </Alert>
+            <StateAlert {...currentAlert} />
           ) : (
             <Box
               sx={{
@@ -178,7 +142,7 @@ export default function ItemEditor({
           color={currentAlert?.color || 'primary'}
           disabled={!itemEditable}
           sx={{
-            width: 0o100,
+            width: 0o110,
           }}
           value={hourInput}
           onChange={(e) => {
@@ -186,10 +150,23 @@ export default function ItemEditor({
             onChange &&
               onChange({
                 ...item,
-                duration_hour: parseInt(hourInput), // TODO: use a form validation library
+                duration_hour: parseInt(e.target.value), // TODO: use a form validation library
               })
           }}
         />
+        {'approved_hour' in item && (
+          <InputWithLabel
+            label="审核学时"
+            type="number"
+            variant="outlined"
+            color={currentAlert?.color || 'primary'}
+            disabled
+            sx={{
+              width: 0o110,
+            }}
+            value={item.approved_hour}
+          />
+        )}
         <Typography level="body2">证明材料</Typography>
         <Grid container columns={{ xs: 3, sm: 4, md: 7 }} spacing={1}>
           {item.evidence_urls.map((src) => (
