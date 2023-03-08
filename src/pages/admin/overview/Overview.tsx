@@ -1,10 +1,12 @@
 import { Alert, Button, Checkbox, Stack, styled, Typography } from '@mui/joy'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
-import { service, ClassesStatsResponse } from '../../../services/service'
+import { service } from '../../../services/service'
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { rowOnHover } from '../../../styles'
+import { rowOnHover } from '../../../utils/styles'
+import { toastProcess } from '../../../utils/toast'
+import { ClassesStatsResponse } from '../../../services/teacher'
 
 const FlexCenter = styled('div')({
   display: 'flex',
@@ -23,7 +25,7 @@ const Row = ({
 }) => {
   const checkboxRef = useRef<HTMLSpanElement>(null)
 
-  const nav = useNavigate()
+  const navigate = useNavigate()
 
   return (
     <TableRow
@@ -62,13 +64,11 @@ const Row = ({
 }
 
 export default function Overview() {
-  const [selectedClassIds, setSelectedClassIds] = useState<Set<number>>(
-    new Set()
-  )
+  const [selectedClassIds, setSelectedClassIds] = useState(new Set<number>())
 
   const [xlsxDownloading, setXlsxDownloading] = useState(false)
 
-  const { data, error } = service.useClassesStats()
+  const { data, error } = service.teacher.useStatistics()
 
   const approvedRate = useMemo(() => {
     if (!data) {
@@ -121,8 +121,8 @@ export default function Overview() {
           onClick={async () => {
             try {
               setXlsxDownloading(true)
-              await service.toast(
-                service.downloadXlsxByClassIds([...selectedClassIds]),
+              await toastProcess(
+                service.teacher.downloadXlsxByClassIds([...selectedClassIds]),
                 '下载'
               )
             } finally {

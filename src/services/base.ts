@@ -13,10 +13,18 @@ export class BaseService {
     this.axios = axios
   }
 
+  private fetcher = async <T>(url: string) => {
+    const { data } = await this.axios.get<T>(url)
+    return data
+  }
+
   protected useGet = <T>(
-    url: string,
+    url: string | null,
     query?: Record<string, string | number | undefined>
   ) => {
+    if (url === null) {
+      return useSWR<T, ApiError>(null, this.fetcher)
+    }
     const filteredQuery =
       query &&
       (Object.fromEntries(
@@ -28,10 +36,7 @@ export class BaseService {
     return useSWR<T, ApiError>(
       url +
         (filteredQuery ? `?${String(new URLSearchParams(filteredQuery))}` : ''),
-      async (url) => {
-        const { data } = await this.axios.get<T>(url)
-        return data
-      }
+      this.fetcher
     )
   }
 }

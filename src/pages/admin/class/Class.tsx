@@ -17,14 +17,16 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { service } from '../../../services/service'
 import { Student, StudentState, studentStates } from '../../../services/model'
 import { Viewer } from './Viewer'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import EditIcon from '@mui/icons-material/Edit'
 import Autocomplete from '@mui/joy/Autocomplete'
-import { rowOnHover } from '../../../styles'
+import { rowOnHover } from '../../../utils/styles'
+import { toastProcess } from '../../../utils/toast'
+import { usePreferences } from '../../../utils/store'
 
 export type ClassViewParams = {
   classId: string
@@ -57,7 +59,7 @@ const studentStateDisplay: Record<
 
 const ClassWithProps = ({ classId }: { classId: number }) => {
   const { data, error, mutate } = service.teacher.useClassStudents(classId)
-  const { data: classesData } = service.useClasses()
+  const { data: classesData } = service.teacher.useManagedClasses()
 
   const [viewerItem, setViewerItem] = useState<Student | null>(null)
 
@@ -83,7 +85,7 @@ const ClassWithProps = ({ classId }: { classId: number }) => {
     (student) =>
       (!stateFilter || student.state === stateFilter) &&
       (!searchText ||
-        student.student_id.includes(searchText) ||
+        student.uid.includes(searchText) ||
         student.name.includes(searchText))
   )
 
@@ -100,8 +102,8 @@ const ClassWithProps = ({ classId }: { classId: number }) => {
           onClick={async () => {
             try {
               setXlsxDownloading(true)
-              await service.toast(
-                service.downloadXlsxByClassIds([classId]),
+              await toastProcess(
+                service.teacher.downloadXlsxByClassIds([classId]),
                 '下载'
               )
             } finally {
@@ -179,15 +181,15 @@ const ClassWithProps = ({ classId }: { classId: number }) => {
                 const stateDisplay = studentStateDisplay[student.state]
                 return (
                   <TableRow
-                    key={student.student_id}
+                    key={student.uid}
                     onClick={() => {
                       setViewerItem(student)
                     }}
                     sx={rowOnHover}
                   >
-                    <TableCell>{student.student_id}</TableCell>
+                    <TableCell>{student.uid}</TableCell>
                     <TableCell>{student.name}</TableCell>
-                    <TableCell>{student.total_hours}</TableCell>
+                    <TableCell>{student.total_hour}</TableCell>
                     <TableCell>
                       <Chip color={stateDisplay.color} size="sm">
                         {stateDisplay.text}
@@ -216,7 +218,21 @@ const ClassWithProps = ({ classId }: { classId: number }) => {
 }
 
 export default function Class() {
+  const navigate = useNavigate()
+
+  useEffect(
+    () =>
+      usePreferences.subscribe(
+        (state) => state.selectedSchoolYear,
+        () => {
+          navigate('./overview', { replace: true })
+        }
+      ),
+    []
+  )
+
   const { classId } = useParams<ClassViewParams>()
+
   const classIdNumber = classId !== undefined ? parseInt(classId) : undefined
   if (classIdNumber === undefined) {
     return <Typography>未选择班级</Typography>

@@ -1,7 +1,7 @@
 import { Close } from '@mui/icons-material'
 import { Box, Grid } from '@mui/joy'
 
-export default function UploadedImage({
+export default function UploadedItem({
   onRemove,
   canBeRemoved,
   src,

@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useMatch } from 'react-router-dom'
-import { usePreferences } from '../store'
+import { usePreferences } from '../utils/store'
 
 export default function Index() {
   const token = usePreferences((state) => state.token)

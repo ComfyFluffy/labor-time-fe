@@ -10,29 +10,31 @@ import {
   typographyClasses,
 } from '@mui/joy'
 import { darken, lighten } from '@mui/material'
-import { useState } from 'react'
-import { LaborItem, LaborItemState } from '../../../../services/model'
-import { NewLaborItem } from '../../Student'
-import InputWithLabel from './InputWithLabel'
+import { ReactNode, useState } from 'react'
 import { Unstable_Grid2 as Grid } from '@mui/material'
-import UploadedItem from './UploadedImage'
+import { LaborItem, LaborItemState } from '../../services/model'
+import { NewLaborItem } from '../../utils/types'
+import { isImageUrl } from '../../utils/utils'
+import InputWithLabel from './InputWithLabel'
+import UploadedItem from './UploadedItem'
+import { service } from '../../services/service'
+import { toastProcess } from '../../utils/toast'
 import UploadButton from './UploadButton'
-import { toastProcess } from '../../../../utils/toast'
-import { service } from '../../../../services/service'
 import ImageViewer from './ImageViewer'
-import { urlIsImage as isImageUrl } from '../../../../utils/utils'
 
 export interface ItemEditorProps {
   item: LaborItem | NewLaborItem
   onRemove: (item: LaborItem | NewLaborItem) => void
   onChange: (item: LaborItem | NewLaborItem) => void
   viewMode?: boolean
+  action?: ReactNode
 }
 export default function ItemEditor({
   item,
   onRemove,
   onChange,
   viewMode,
+  action,
 }: ItemEditorProps) {
   const [viewerIndex, setViewerIndex] = useState<number | null>(null)
   const [hourInput, setHourInput] = useState(
@@ -239,6 +241,8 @@ export default function ItemEditor({
             onClose={() => setViewerIndex(null)}
           />
         )}
+
+        {action}
       </Stack>
     </Card>
   )

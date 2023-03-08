@@ -1,11 +1,11 @@
 import { Alert, Button, Stack, Typography } from '@mui/joy'
 import ErrorIcon from '@mui/icons-material/Error'
 import AddIcon from '@mui/icons-material/Add'
-import { LaborItem } from '../../../../services/model'
+import { LaborItem } from '../../../services/model'
 import { useMemo } from 'react'
 import Explanation from './Explanation'
-import ItemEditor from './ItemEditor'
-import { CategoryWithNewItem, NewLaborItem } from '../../Student'
+import { CategoryWithNewItem, NewLaborItem } from '../Student'
+import ItemEditor from '../../../components/ItemEditor'
 
 export interface EditorProps {
   category: CategoryWithNewItem

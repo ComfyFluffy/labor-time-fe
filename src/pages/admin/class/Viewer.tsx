@@ -11,15 +11,14 @@ import {
 } from '@mui/joy'
 import { useMediaQuery } from '@mui/material'
 import { Student } from '../../../services/model'
-import { ItemEditor } from '../../student/Editor'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
-import UndoIcon from '@mui/icons-material/Undo'
 import StudentInfo from '../../../components/StudentInfo'
 import Autocomplete from '@mui/joy/Autocomplete'
 import { useState } from 'react'
 import { service } from '../../../services/service'
 import { toastOnError } from '../../../utils/toast'
+import ItemEditor from '../../../components/ItemEditor'
 
 const AskReason = ({
   onClose,
@@ -86,7 +85,9 @@ export const Viewer = ({
   const [askReasonOpen, setAskReasonOpen] = useState(false)
   const [reasonItemId, setReasonItemId] = useState<number | null>(null)
 
-  const { data, error, mutate } = service.student(student.uid)
+  const { data, error, mutate } = service.teacher.useStudentLaborItems(
+    student.uid
+  )
 
   return (
     <>
@@ -185,23 +186,6 @@ export const Viewer = ({
                                 打回
                               </Button>
                             )}
-                            {(item.state === 'approved' ||
-                              item.state === 'rejected') && (
-                              <Button
-                                startDecorator={<UndoIcon />}
-                                color="warning"
-                                variant="soft"
-                                onClick={async () => {
-                                  await service.toastOnError(
-                                    service.setItemPending(item.id)
-                                  )
-                                  mutate()
-                                }}
-                              >
-                                撤销
-                                {item.state === 'approved' ? '通过' : '打回'}
-                              </Button>
-                            )}
                           </Stack>
                         }
                       />
@@ -220,8 +204,8 @@ export const Viewer = ({
 
       <AskReason
         onSubmit={async (reason) => {
-          await service.toastOnError(
-            service.rejectItem(reasonItemId!, reason || '')
+          await toastOnError(
+            service.teacher.rejectItem(reasonItemId!, reason || '')
           )
           mutate()
           setAskReasonOpen(false)

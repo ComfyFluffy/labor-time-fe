@@ -2,7 +2,7 @@ import { Alert, Button, Modal, ModalDialog, Stack, Typography } from '@mui/joy'
 import { shallow } from 'zustand/shallow'
 import StudentInfo from '../../../components/StudentInfo'
 import { service } from '../../../services/service'
-import { usePreferences } from '../../../store'
+import { usePreferences } from '../../../utils/store'
 
 export default function ConfirmInfo() {
   const { confirmPersonalInfo, personalInfoConfirmed } = usePreferences(

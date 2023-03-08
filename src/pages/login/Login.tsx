@@ -26,7 +26,7 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState('')
   const [userType, setUserType] = useState<UserType>('student')
 
-  const nav = useNavigate()
+  const navigate = useNavigate()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()

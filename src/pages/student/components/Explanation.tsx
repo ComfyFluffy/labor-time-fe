@@ -1,5 +1,5 @@
 import { Alert, Stack, Typography } from '@mui/joy'
-import { Category } from '../../../../services/model'
+import { Category } from '../../../services/model'
 
 export default function Explanation({
   explanation: { text, title },

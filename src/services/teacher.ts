@@ -52,8 +52,11 @@ export type PassedStudentsResponse = {
 }[]
 
 export class TeacherService extends BaseService {
-  useManagedClasses = (schoolYear: string, schoolId: number) => {
-    return this.useGet<Class[]>('/v2/teacher/classes', {
+  useManagedClasses = (schoolYear: string | null, schoolId: number | null) => {
+    if (schoolYear === null || schoolId === null) {
+      return this.useGet<Class[]>(null)
+    }
+    return this.useGet<Class[]>('/v2/teacher/class', {
       school_year: schoolYear,
       college_id: schoolId,
     })

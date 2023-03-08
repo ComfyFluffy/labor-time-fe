@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
-import { usePreferences } from '../store'
+import { usePreferences } from '../utils/store'
 import { StudentService } from './student'
 import { TeacherService } from './teacher'
 import { BaseService } from './base'
@@ -41,7 +41,7 @@ export class Service extends BaseService {
 
       const token = usePreferences.getState().token
       if (token) {
-        config.headers.Authorization = token
+        config.headers.Authorization = `labor ${token}`
       }
       return config
     })
@@ -84,4 +84,3 @@ const axiosInstance = axios.create({
 
 export const service = new Service(axiosInstance)
 service.useAxiosInterceptor()
-window.service = service

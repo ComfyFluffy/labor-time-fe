@@ -1,7 +1,6 @@
 import { Alert, Button, Container, Stack, Typography } from '@mui/joy'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
-import { Category, LaborItem } from '../../services/model'
 import PublishIcon from '@mui/icons-material/Publish'
 import { useMemo, useState } from 'react'
 import produce from 'immer'
@@ -14,21 +13,13 @@ import {
 import Header from './components/Header'
 import ConfirmInfo from './components/ConfirmInfo'
 import Editor from './components/Editor'
+import {
+  CategoryWithNewItem,
+  NewLaborItem,
+  UpdateLaborItem,
+} from '../../utils/types'
 
 let itemLocalId = 0
-
-export type NewLaborItem = Pick<LaborItem, 'description' | 'evidence_urls'> & {
-  local_id: number
-  category_id: number
-  duration_hour?: number
-}
-export type CategoryWithNewItem = Omit<Category, 'items'> & {
-  items: (NewLaborItem | LaborItem)[]
-}
-type UpdateLaborItem = Pick<
-  LaborItem,
-  'id' | 'description' | 'duration_hour' | 'evidence_urls'
->
 
 export default function Student() {
   const [currentItemIndex, setCurrentItemIndex] = useState(0)

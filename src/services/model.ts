@@ -8,11 +8,11 @@ export const studentStates = [
 ] as const
 export type StudentState = typeof studentStates[number]
 
-export const roleIdToRole = {
-  1: '教师',
-  2: '院级管理员',
-  3: '校级管理员',
-} as const
+export const roleIdToRole = new Map([
+  [1, '教师'],
+  [2, '院级管理员'],
+  [3, '校级管理员'],
+])
 
 export type UserType = 'student' | 'teacher'
 
