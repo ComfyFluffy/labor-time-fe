@@ -1,4 +1,4 @@
-import { Alert, Button, Stack, Typography } from '@mui/joy'
+import { Alert, Button, Stack } from '@mui/joy'
 import ErrorIcon from '@mui/icons-material/Error'
 import AddIcon from '@mui/icons-material/Add'
 import { LaborItem } from '../../../services/model'
@@ -20,7 +20,7 @@ export default function Editor({
   onRemoveItem,
   onAddItem,
 }: EditorProps) {
-  const { name, explanation, items } = category
+  const { explanation, items } = category
 
   const overMaxHours = useMemo(
     () =>
@@ -32,8 +32,6 @@ export default function Editor({
 
   return (
     <>
-      <Typography level="h5">{name}</Typography>
-
       {explanation && <Explanation explanation={explanation} />}
 
       <Stack spacing={1}>

@@ -18,6 +18,8 @@ import {
   NewLaborItem,
   UpdateLaborItem,
 } from '../../utils/types'
+import { LaborItem } from '../../services/model'
+import MenuButton from '../../components/MenuButton'
 
 let itemLocalId = 0
 
@@ -100,53 +102,72 @@ export default function Student() {
 
   if (localCategories) {
     const currentCategory = localCategories[currentItemIndex]
+
+    const handleRemoveItem = (item: LaborItem | NewLaborItem): void => {
+      if ('id' in item) {
+        setItemsActions((actions) =>
+          produce(actions, (draft) => {
+            draft.removedIds.add(item.id)
+          })
+        )
+      } else if ('local_id' in item) {
+        setItemsActions((actions) =>
+          produce(actions, (draft) => {
+            draft.added.delete(item.local_id)
+          })
+        )
+      }
+    }
+    const handleAddItem = () => {
+      setItemsActions((actions) =>
+        produce(actions, (draft) => {
+          const newItem: NewLaborItem = {
+            category_id: currentCategory.id,
+            description: '',
+            evidence_urls: [],
+            local_id: itemLocalId++,
+          }
+          draft.added.set(newItem.local_id, newItem)
+        })
+      )
+    }
+    const handleUpdateItem = (item: LaborItem | NewLaborItem): void => {
+      setItemsActions((actions) =>
+        produce(actions, (draft) => {
+          if ('id' in item) {
+            draft.updated.set(item.id, item)
+          } else if ('local_id' in item) {
+            draft.added.set(item.local_id, item)
+          }
+        })
+      )
+    }
+
     content = (
       <>
         <ConfirmInfo />
         <Stack spacing={2}>
           <Typography level="h4">学生劳动实践学时认定</Typography>
 
+          <MenuButton
+            size="lg"
+            items={localCategories}
+            display={(item) => item.name}
+            itemId={(item) => item.id}
+            selectedItem={currentCategory}
+            onChange={(selectedItem) =>
+              setCurrentItemIndex(
+                localCategories.findIndex((item) => item.id === selectedItem.id)
+              )
+            }
+            sx={{ width: 1, display: 'flex' }}
+          />
+
           <Editor
             category={currentCategory}
-            onRemoveItem={(item) => {
-              if ('id' in item) {
-                setItemsActions((actions) =>
-                  produce(actions, (draft) => {
-                    draft.removedIds.add(item.id)
-                  })
-                )
-              } else if ('local_id' in item) {
-                setItemsActions((actions) =>
-                  produce(actions, (draft) => {
-                    draft.added.delete(item.local_id)
-                  })
-                )
-              }
-            }}
-            onAddItem={() => {
-              setItemsActions((actions) =>
-                produce(actions, (draft) => {
-                  const newItem: NewLaborItem = {
-                    category_id: currentCategory.id,
-                    description: '',
-                    evidence_urls: [],
-                    local_id: itemLocalId++,
-                  }
-                  draft.added.set(newItem.local_id, newItem)
-                })
-              )
-            }}
-            onUpdateItem={(item) => {
-              setItemsActions((actions) =>
-                produce(actions, (draft) => {
-                  if ('id' in item) {
-                    draft.updated.set(item.id, item)
-                  } else if ('local_id' in item) {
-                    draft.added.set(item.local_id, item)
-                  }
-                })
-              )
-            }}
+            onRemoveItem={handleRemoveItem}
+            onAddItem={handleAddItem}
+            onUpdateItem={handleUpdateItem}
           />
 
           <Stack
