@@ -1,6 +1,6 @@
 import { BaseService } from './base'
 import { Category, Class, Student, Teacher } from './model'
-import { TeacherClassRelation, TeacherService } from './teacher'
+import { TeacherClassRelation } from './teacher'
 import { UserType } from './model'
 
 export interface AddStudentRequest {

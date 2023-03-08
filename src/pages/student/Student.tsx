@@ -1,94 +1,50 @@
-import {
-  Alert,
-  Button,
-  Container,
-  Modal,
-  ModalDialog,
-  Stack,
-  Typography,
-} from '@mui/joy'
+import { Alert, Button, Container, Stack, Typography } from '@mui/joy'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
-import { Editor } from './Editor'
 import { Category, LaborItem } from '../../services/model'
 import PublishIcon from '@mui/icons-material/Publish'
 import { useMemo, useState } from 'react'
 import produce from 'immer'
-import { usePreferences } from '../../store'
-import { shallow } from 'zustand/shallow'
+import { service } from '../../services/service'
+import { toastProcess } from '../../utils/toast'
 import {
-  AddItemRequest,
-  service,
-  UpdateItemRequest,
-} from '../../services/service'
-import { Me } from './Me'
-import StudentInfo from '../../components/StudentInfo'
+  AddLaborItemsRequest,
+  ModifyLaborItemsRequest,
+} from '../../services/student'
+import Header from './components/Header'
+import ConfirmInfo from './components/ConfirmInfo'
+import Editor from './components/Editor'
 
 let itemLocalId = 0
 
-export type NewItem = Pick<
-  LaborItem,
-  'description' | 'picture_urls' | 'duration_hour'
-> & {
+export type NewLaborItem = Pick<LaborItem, 'description' | 'evidence_urls'> & {
   local_id: number
   category_id: number
+  duration_hour?: number
 }
 export type CategoryWithNewItem = Omit<Category, 'items'> & {
-  items: (NewItem | LaborItem)[]
+  items: (NewLaborItem | LaborItem)[]
 }
-type UpdateItem = Pick<
+type UpdateLaborItem = Pick<
   LaborItem,
-  'id' | 'description' | 'duration_hour' | 'picture_urls'
+  'id' | 'description' | 'duration_hour' | 'evidence_urls'
 >
-
-const ConfirmPersonalInfo = () => {
-  const { confirmPersonalInfo, personalInfoConfirmed } = usePreferences(
-    (state) => ({
-      confirmPersonalInfo: state.confirmPersonalInfo,
-      personalInfoConfirmed: state.personalInfoConfirmed,
-    }),
-    shallow
-  )
-
-  const { data, error } = service.useStudentSelf()
-
-  return (
-    <Modal open={!personalInfoConfirmed}>
-      <ModalDialog>
-        <Stack spacing={2}>
-          <Stack spacing={1}>
-            <Typography level="h4">个人信息</Typography>
-            <Typography>请确认你的个人信息，如有错误请联系辅导员</Typography>
-          </Stack>
-
-          {error && <Alert color="danger">获取个人信息失败</Alert>}
-          {data && <StudentInfo student={data} />}
-
-          <Button variant="solid" onClick={() => confirmPersonalInfo()}>
-            确认
-          </Button>
-        </Stack>
-      </ModalDialog>
-    </Modal>
-  )
-}
 
 export default function Student() {
   const [currentItemIndex, setCurrentItemIndex] = useState(0)
 
-  const emptyItemsActions = () =>
-    ({
-      added: new Map(),
-      updated: new Map(),
-      removedIds: new Set(),
-    } as {
-      added: Map<number, NewItem> // local id -> item
-      updated: Map<number, UpdateItem> // item id -> item
-      removedIds: Set<number>
-    })
-  const [itemsActions, setItemsActions] = useState(emptyItemsActions)
+  const emptyItemsActions = () => ({
+    added: new Map<number, NewLaborItem>(), // local id -> item
+    updated: new Map<number, UpdateLaborItem>(), // item id -> item
+    removedIds: new Set<number>(),
+  })
+  const [itemsActions, setItemsActions] = useState({
+    added: new Map<number, NewLaborItem>(), // local id -> item
+    updated: new Map<number, UpdateLaborItem>(), // item id -> item
+    removedIds: new Set<number>(),
+  })
 
-  const { data: categories, error, mutate } = service.useCategories()
+  const { data: categories, error, mutate } = service.student.useCategories()
 
   const localCategories: CategoryWithNewItem[] | undefined = useMemo(
     () =>
@@ -116,30 +72,34 @@ export default function Student() {
   )
 
   const onSubmit = () => {
-    service.toast(async () => {
-      const addedItems: AddItemRequest = Array.from(
+    toastProcess(async () => {
+      const addRequest: AddLaborItemsRequest = Array.from(
         itemsActions.added.values()
-      ).map((item) => ({
-        id: item.category_id,
+      ).map(({ category_id, description, duration_hour, evidence_urls }) => ({
+        id: category_id,
         items: [
           {
-            description: item.description,
-            duration_hour: +item.duration_hour,
-            picture_urls: item.picture_urls,
+            description,
+            duration_hour: duration_hour || 0,
+            evidence_urls,
           },
         ],
       }))
-      const updatedItems: UpdateItemRequest = Array.from(
+      const modifyRequest: ModifyLaborItemsRequest = Array.from(
         itemsActions.updated.values()
-      ).map((item) => ({
-        id: item.id,
-        description: item.description,
-        duration_hour: +item.duration_hour,
-        picture_urls: item.picture_urls,
+      ).map(({ id, description, duration_hour, evidence_urls }) => ({
+        id,
+        description,
+        duration_hour,
+        evidence_urls,
       }))
-      const removedIds = Array.from(itemsActions.removedIds.values())
+      const deleteIds = Array.from(itemsActions.removedIds.values())
 
-      await service.updateItems(addedItems, updatedItems, removedIds)
+      await service.student.updateLaborItems(
+        addRequest,
+        modifyRequest,
+        deleteIds
+      )
       setItemsActions(emptyItemsActions())
       mutate()
     })
@@ -151,7 +111,7 @@ export default function Student() {
     const currentCategory = localCategories[currentItemIndex]
     content = (
       <>
-        <ConfirmPersonalInfo />
+        <ConfirmInfo />
         <Stack spacing={2}>
           <Typography level="h4">学生劳动实践学时认定</Typography>
 
@@ -175,11 +135,10 @@ export default function Student() {
             onAddItem={() => {
               setItemsActions((actions) =>
                 produce(actions, (draft) => {
-                  const newItem: NewItem = {
+                  const newItem: NewLaborItem = {
                     category_id: currentCategory.id,
                     description: '',
-                    duration_hour: '',
-                    picture_urls: [],
+                    evidence_urls: [],
                     local_id: itemLocalId++,
                   }
                   draft.added.set(newItem.local_id, newItem)
@@ -250,7 +209,7 @@ export default function Student() {
         py: 2,
       }}
     >
-      <Me />
+      <Header />
       {error && (
         <Alert color="danger" sx={{ my: 2 }}>
           获取数据失败：{String(error)}

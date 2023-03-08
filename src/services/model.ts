@@ -29,10 +29,10 @@ export interface LaborItem {
 export interface Category {
   id: number
   name: string
-  min_hour?: number
-  max_hour?: number
+  min_hour: number
+  max_hour: number
   items: LaborItem[]
-  explanation?: {
+  explanation: {
     title: string
     text: string
   }
@@ -45,6 +45,7 @@ export interface Student {
   classname: string
   total_hour: number
   avatar: string
+  state: StudentState
 }
 
 export interface Teacher {

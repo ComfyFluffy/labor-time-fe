@@ -10,7 +10,7 @@ export default function StudentInfo({ student }: { student: Student }) {
         <Typography color="neutral">班级</Typography>
       </Stack>
       <Stack>
-        {[student.student_id, student.name, student.class_name].map((v, i) => (
+        {[student.uid, student.name, student.classname].map((v, i) => (
           <Typography key={i}>{v}</Typography>
         ))}
       </Stack>

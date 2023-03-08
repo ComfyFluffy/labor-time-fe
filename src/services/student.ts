@@ -28,7 +28,7 @@ export class StudentService extends BaseService {
     return this.useGet<Student>('/v2/student/info')
   }
 
-  useLaborItems = () => {
+  useCategories = () => {
     return this.useGet<Category[]>('/v2/labor/student')
   }
 
@@ -55,11 +55,27 @@ export class StudentService extends BaseService {
     return download_url
   }
 
-  addLaborItems = async (request: AddLaborItemsRequest) => {
+  private addLaborItems = async (request: AddLaborItemsRequest) => {
     await this.axios.post('/v2/student/labor', request)
   }
 
-  deleteLaborItems = async (ids: number[]) => {
+  private modifyLaborItems = async (request: ModifyLaborItemsRequest) => {
+    await this.axios.put('/v2/student/labor', request)
+  }
+
+  private deleteLaborItems = async (ids: number[]) => {
     await this.axios.post('/v2/student/labor/delete', ids)
+  }
+
+  updateLaborItems = async (
+    addRequest: AddLaborItemsRequest,
+    modifyRequest: ModifyLaborItemsRequest,
+    deleteIds: number[]
+  ) => {
+    await Promise.all([
+      this.addLaborItems(addRequest),
+      this.modifyLaborItems(modifyRequest),
+      this.deleteLaborItems(deleteIds),
+    ])
   }
 }

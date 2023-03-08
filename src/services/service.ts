@@ -84,3 +84,4 @@ const axiosInstance = axios.create({
 
 export const service = new Service(axiosInstance)
 service.useAxiosInterceptor()
+window.service = service

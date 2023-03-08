@@ -1,6 +1,5 @@
-import { Category, Class, Student, Teacher } from './model'
+import { Class, Student, Teacher } from './model'
 import { BaseService } from './base'
-import { usePreferences } from '../store'
 import fileDownload from 'js-file-download'
 
 export interface RejectLaborItemRequest {

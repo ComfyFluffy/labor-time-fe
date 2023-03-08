@@ -7,9 +7,6 @@ const Class = makeLazy(() => import('./class/Class'))
 const UserManagement = makeLazy(
   () => import('./user-management/UserManagement')
 )
-const SystemManagement = makeLazy(
-  () => import('./system-management/SystemManagement')
-)
 
 export const adminRoute = () => ({
   path: 'admin',
@@ -22,6 +19,5 @@ export const adminRoute = () => ({
     },
     { path: 'class/:classId', element: <Class /> },
     { path: 'user-management', element: <UserManagement /> },
-    { path: 'system-management', element: <SystemManagement /> },
   ],
 })

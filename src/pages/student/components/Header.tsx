@@ -1,8 +1,8 @@
 import { Button, Stack, Typography } from '@mui/joy'
-import { service } from '../../services/service'
+import { service } from '../../../services/service'
 
-export const Me = () => {
-  const { data } = service.useStudentSelf()
+export default function Header() {
+  const { data } = service.student.useSelfInfo()
 
   return (
     <Stack direction="row" justifyContent="end" alignItems="center" spacing={2}>
@@ -14,7 +14,7 @@ export const Me = () => {
           spacing={1}
         >
           <Typography color="neutral">{data.name}</Typography>
-          <Typography color="neutral">{data.student_id}</Typography>
+          <Typography color="neutral">{data.uid}</Typography>
         </Stack>
       )}
       <Button onClick={() => service.logout()} variant="soft" color="neutral">

@@ -55,8 +55,8 @@ const studentStateDisplay: Record<
   },
 }
 
-const ClassWithArg = ({ classId }: { classId: number }) => {
-  const { data, error, mutate } = service.useClassStudents(classId)
+const ClassWithProps = ({ classId }: { classId: number }) => {
+  const { data, error, mutate } = service.teacher.useClassStudents(classId)
   const { data: classesData } = service.useClasses()
 
   const [viewerItem, setViewerItem] = useState<Student | null>(null)
@@ -224,5 +224,5 @@ export default function Class() {
   if (Number.isNaN(classIdNumber)) {
     return <Typography>班级 ID {classId} 不合法</Typography>
   }
-  return <ClassWithArg classId={classIdNumber} />
+  return <ClassWithProps classId={classIdNumber} />
 }

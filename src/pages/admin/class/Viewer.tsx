@@ -19,6 +19,7 @@ import StudentInfo from '../../../components/StudentInfo'
 import Autocomplete from '@mui/joy/Autocomplete'
 import { useState } from 'react'
 import { service } from '../../../services/service'
+import { toastOnError } from '../../../utils/toast'
 
 const AskReason = ({
   onClose,
@@ -85,9 +86,7 @@ export const Viewer = ({
   const [askReasonOpen, setAskReasonOpen] = useState(false)
   const [reasonItemId, setReasonItemId] = useState<number | null>(null)
 
-  const { data, error, mutate } = service.useStudentCategories(
-    student.student_id
-  )
+  const { data, error, mutate } = service.student(student.uid)
 
   return (
     <>
@@ -164,8 +163,8 @@ export const Viewer = ({
                                 color="success"
                                 variant="soft"
                                 onClick={async () => {
-                                  await service.toastOnError(
-                                    service.passItem(item.id)
+                                  await toastOnError(
+                                    service.teacher.passLaborItem(item.id)
                                   )
                                   mutate()
                                 }}
