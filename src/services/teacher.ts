@@ -68,8 +68,11 @@ export class TeacherService extends BaseService {
     })
   }
 
-  useStudentLaborItems = (studentId: number, schoolYear: string) => {
-    return this.useGet<Category[]>('/v2/labor/teacher', {
+  useStudentLaborItems = (studentId: number, schoolYear: string | null) => {
+    if (schoolYear === null) {
+      return this.useGet<Category[]>(null)
+    }
+    return this.useGet<Category[]>('/v2/teacher/labor', {
       student_id: studentId,
       school_year: schoolYear,
     })
