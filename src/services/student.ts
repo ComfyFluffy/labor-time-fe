@@ -27,12 +27,17 @@ export class StudentService extends BaseService {
   }
 
   useCategories = () => {
-    return this.useGet<Category[]>('/v2/labor/student')
+    return this.useGet<Category[]>('/v2/student/labor')
   }
 
-  private signFileUploadUrl = async (): Promise<SignOssResponse> => {
-    const { data } = await this.axios.get<SignOssResponse>(
-      '/v2/labor/student/evidence'
+  private signFileUploadUrl = async (
+    filename: string
+  ): Promise<SignOssResponse> => {
+    const { data } = await this.axios.post<SignOssResponse>(
+      '/v2/student/labor/evidence',
+      {
+        filename,
+      }
     )
     return data
   }
@@ -43,7 +48,7 @@ export class StudentService extends BaseService {
       maxWidthOrHeight: 1920,
       useWebWorker: true,
     })
-    const { upload_url, download_url } = await this.signFileUploadUrl()
+    const { upload_url, download_url } = await this.signFileUploadUrl(file.name)
     // Global axios instance is used here.
     await axios.put(upload_url, compressedFile, {
       headers: {
