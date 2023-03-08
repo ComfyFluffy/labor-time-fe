@@ -3,9 +3,9 @@ import ErrorIcon from '@mui/icons-material/Error'
 import AddIcon from '@mui/icons-material/Add'
 import { LaborItem } from '../../../services/model'
 import { useMemo } from 'react'
-import Explanation from './Explanation'
-import { CategoryWithNewItem, NewLaborItem } from '../Student'
 import ItemEditor from '../../../components/ItemEditor'
+import Explanation from './Explanation'
+import { CategoryWithNewItem, NewLaborItem } from '../../../utils/types'
 
 export interface EditorProps {
   category: CategoryWithNewItem

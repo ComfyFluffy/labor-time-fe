@@ -165,7 +165,7 @@ export const Viewer = ({
                                 variant="soft"
                                 onClick={async () => {
                                   await toastOnError(
-                                    service.teacher.passLaborItem(item.id)
+                                    service.teacher.passLaborItem({})
                                   )
                                   mutate()
                                 }}
@@ -204,8 +204,14 @@ export const Viewer = ({
 
       <AskReason
         onSubmit={async (reason) => {
+          if (reasonItemId === null) {
+            throw new Error('reasonItemId is null')
+          }
           await toastOnError(
-            service.teacher.rejectItem(reasonItemId!, reason || '')
+            service.teacher.rejectLaborItem({
+              id: reasonItemId,
+              reason: reason || '',
+            })
           )
           mutate()
           setAskReasonOpen(false)

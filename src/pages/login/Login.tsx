@@ -35,7 +35,7 @@ export default function Login() {
         setSubmitting(true)
 
         await service.login(credentials, userType)
-        nav(userType === 'student' ? '/student' : '/admin')
+        navigate(userType === 'student' ? '/student' : '/admin')
       } catch (err) {
         if (err instanceof AxiosError) {
           let message: string | undefined = err.response?.data.type

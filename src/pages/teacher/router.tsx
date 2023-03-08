@@ -1,16 +1,16 @@
 import { Navigate } from 'react-router-dom'
 import { makeLazy } from '../../utils/lazy'
 
-const Admin = makeLazy(() => import('./Admin'))
+const Teacher = makeLazy(() => import('./Teacher'))
 const Overview = makeLazy(() => import('./overview/Overview'))
 const Class = makeLazy(() => import('./class/Class'))
 const UserManagement = makeLazy(
   () => import('./user-management/UserManagement')
 )
 
-export const adminRoute = () => ({
-  path: 'admin',
-  element: <Admin />,
+export const teacherRoute = () => ({
+  path: 'teacher',
+  element: <Teacher />,
   children: [
     { path: '', element: <Navigate to="overview" replace /> },
     {

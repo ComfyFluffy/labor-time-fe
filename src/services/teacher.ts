@@ -1,4 +1,4 @@
-import { Class, Student, Teacher } from './model'
+import { Category, Class, Student, Teacher } from './model'
 import { BaseService } from './base'
 import fileDownload from 'js-file-download'
 
@@ -69,7 +69,7 @@ export class TeacherService extends BaseService {
   }
 
   useStudentLaborItems = (studentId: number, schoolYear: string) => {
-    return this.useGet<Class[]>('/v2/labor/teacher', {
+    return this.useGet<Category[]>('/v2/labor/teacher', {
       student_id: studentId,
       school_year: schoolYear,
     })
