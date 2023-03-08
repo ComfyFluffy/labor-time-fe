@@ -16,12 +16,10 @@ export type AddLaborItemsRequest = (Pick<Category, 'id'> & {
   items: Pick<LaborItem, 'description' | 'duration_hour' | 'evidence_urls'>[]
 })[]
 
-export type ModifyLaborItemsRequest = (Pick<Category, 'id'> & {
-  items: Pick<
-    LaborItem,
-    'id' | 'description' | 'duration_hour' | 'evidence_urls'
-  >[]
-})[]
+export type ModifyLaborItemsRequest = Pick<
+  LaborItem,
+  'id' | 'description' | 'duration_hour' | 'evidence_urls'
+>[]
 
 export class StudentService extends BaseService {
   useSelfInfo = () => {
