@@ -96,14 +96,14 @@ export class SuperAdminService extends BaseService {
   }
 
   addAdmin = async (teacherId: number, schoolId: number) => {
-    await this.axios.post('/v2/teacaher/admin', {
+    await this.axios.post('/v2/teacaher/teacher', {
       college_id: schoolId,
       teacher_id: teacherId,
     })
   }
 
   removeAdmin = async (teacherId: number, schoolId: number) => {
-    await this.axios.post('/v2/teacaher/admin/delete', {
+    await this.axios.post('/v2/teacaher/teacher/delete', {
       college_id: schoolId,
       teacher_id: teacherId,
     })

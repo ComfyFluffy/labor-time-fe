@@ -30,7 +30,7 @@ const Row = ({
   return (
     <TableRow
       onClick={() => {
-        navigate(`/admin/class/${row.class.id}`)
+        navigate(`/teacher/class/${row.class.id}`)
       }}
       sx={rowOnHover}
     >

@@ -44,11 +44,11 @@ export default function NavList() {
       teacherData === undefined ? null : teacherData.college_id
     )
 
-  const classRouteMatch = useMatch('/admin/class/:classId')
+  const classRouteMatch = useMatch('/teacher/class/:classId')
 
   const links: NavListButtonProps[] = [
     {
-      to: '/admin/overview',
+      to: '/teacher/overview',
       title: '数据总览',
       Icon: PieChart,
     },
@@ -56,13 +56,13 @@ export default function NavList() {
 
   const adminLinks: NavListButtonProps[] = [
     {
-      to: '/admin/user-management',
+      to: '/teacher/user-management',
       title: '教师用户管理',
       Icon: SupervisorAccount,
     },
 
     {
-      to: '/admin/system-management',
+      to: '/teacher/system-management',
       title: '系统管理',
       Icon: Settings,
     },
@@ -153,7 +153,7 @@ export default function NavList() {
                       selected={match}
                       variant={match ? 'soft' : undefined}
                       component={Link}
-                      to={`/admin/class/${item.id}`}
+                      to={`/teacher/class/${item.id}`}
                     >
                       {item.name}
                     </ListItemButton>
