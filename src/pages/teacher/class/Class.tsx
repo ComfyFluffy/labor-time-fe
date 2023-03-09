@@ -27,34 +27,10 @@ import { rowOnHover } from '../../../utils/styles'
 import { toastProcess } from '../../../utils/toast'
 import { usePreferences } from '../../../utils/store'
 import ApiErrorAlert from '../../../components/ApiErrorAlert'
+import ClassTable from './components/ClassTable'
 
 export type ClassViewParams = {
   classId: string
-}
-
-const studentStateDisplay: Record<
-  StudentState,
-  {
-    color: ColorPaletteProp
-    text: string
-  }
-> = {
-  allApproved: {
-    color: 'success',
-    text: '已全部通过',
-  },
-  hasPendingItem: {
-    color: 'warning',
-    text: '有待审核项目',
-  },
-  hasRejectedItem: {
-    color: 'danger',
-    text: '有未通过项目',
-  },
-  notSubmitted: {
-    color: 'neutral',
-    text: '未提交',
-  },
 }
 
 const ClassWithProps = ({ classId }: { classId: number }) => {
@@ -147,51 +123,7 @@ const ClassWithProps = ({ classId }: { classId: number }) => {
             />
           )}
 
-          <Table
-            size="small"
-            sx={{
-              userSelect: 'none',
-            }}
-          >
-            <TableHead>
-              <TableRow>
-                <TableCell>学号</TableCell>
-                <TableCell>姓名</TableCell>
-                <TableCell
-                  sx={{
-                    maxWidth: 0o100,
-                  }}
-                >
-                  有效时长
-                </TableCell>
-                <TableCell>当前状态</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {filteredData.map((student) => {
-                const stateDisplay = studentStateDisplay[student.state]
-                return (
-                  <TableRow
-                    key={student.uid}
-                    onClick={() => {
-                      setViewerItem(student)
-                    }}
-                    sx={rowOnHover}
-                  >
-                    <TableCell>{student.uid}</TableCell>
-                    <TableCell>{student.name}</TableCell>
-                    <TableCell>{student.total_hour}</TableCell>
-                    <TableCell>
-                      <Chip color={stateDisplay.color} size="sm">
-                        {stateDisplay.text}
-                      </Chip>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+          <ClassTable students={filteredData} onRowClick={setViewerItem} />
         </>
       )}
       {filteredData?.length === 0 && (

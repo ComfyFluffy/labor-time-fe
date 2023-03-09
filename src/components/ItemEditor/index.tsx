@@ -131,9 +131,7 @@ export default function ItemEditor({
           variant="outlined"
           color={currentAlert?.color || 'primary'}
           value={item.description}
-          onChange={(e) =>
-            onChange && onChange({ ...item, description: e.target.value })
-          }
+          onChange={(e) => onChange?.({ ...item, description: e.target.value })}
         />
         <InputWithLabel
           label="学时"
@@ -147,14 +145,13 @@ export default function ItemEditor({
           value={hourInput}
           onChange={(e) => {
             setHourInput(e.target.value)
-            onChange &&
-              onChange({
-                ...item,
-                duration_hour: parseInt(e.target.value), // TODO: use a form validation library
-              })
+            onChange?.({
+              ...item,
+              duration_hour: parseInt(e.target.value), // TODO: use a form validation library
+            })
           }}
         />
-        {'approved_hour' in item && (
+        {'approved_hour' in item && item.state !== 'pending' && (
           <InputWithLabel
             label="审核学时"
             type="number"
@@ -199,11 +196,10 @@ export default function ItemEditor({
                 onUpload={(file) => {
                   toastProcess(async () => {
                     const url = await service.student.uploadImage(file)
-                    onChange &&
-                      onChange({
-                        ...item,
-                        evidence_urls: [...(item.evidence_urls || []), url],
-                      })
+                    onChange?.({
+                      ...item,
+                      evidence_urls: [...(item.evidence_urls || []), url],
+                    })
                   }, '上传图片')
                 }}
               />

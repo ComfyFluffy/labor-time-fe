@@ -442,7 +442,7 @@ export default function UserManagement() {
               <TableCell />
               <TableCell>姓名</TableCell>
               <TableCell>手机号码</TableCell>
-              <TableCell>管理员</TableCell>
+              <TableCell>院级管理员</TableCell>
             </TableRow>
           </TableHead>
 

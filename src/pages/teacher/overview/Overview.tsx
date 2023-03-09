@@ -9,6 +9,8 @@ import { toastProcess } from '../../../utils/toast'
 import { ClassesStatsResponse } from '../../../services/teacher'
 import ApiErrorAlert from '../../../components/ApiErrorAlert'
 import ClassesOverview from './components/ClassesOverview'
+import { usePreferences } from '../../../utils/store'
+import SchoolsOverview from './components/SchoolsOverview'
 
 const FlexCenter = styled('div')({
   display: 'flex',
@@ -65,7 +67,8 @@ const Row = ({
   )
 }
 export default function Overview() {
-  return <ClassesOverview schoolId={1} schoolYear={'2022-2023'} />
+  const selectedSchoolYear = usePreferences((state) => state.selectedSchoolYear)
+  return <SchoolsOverview schoolYear={selectedSchoolYear} />
 }
 
 export function Overview1() {

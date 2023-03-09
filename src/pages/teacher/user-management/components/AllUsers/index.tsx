@@ -1,15 +1,16 @@
 import { Stack, Table } from '@mui/joy'
 import { service } from '../../../../../services/service'
+import { toastOnError } from '../../../../../utils/toast'
 import AdminEditorRow from './AdminEditorRow'
 
 export default function AdminEditor() {
   const { data, mutate } = service.superAdmin.useTeachers(1, '2022-2023')
 
-  const handleAdminChange = (teacherId: number, newValue: boolean) => {
+  const handleAdminChange = async (teacherId: number, newValue: boolean) => {
     if (newValue) {
-      service.superAdmin.addAdmin(teacherId)
+      await toastOnError(service.superAdmin.addAdmin(teacherId))
     } else {
-      service.superAdmin.removeAdmin(teacherId)
+      await toastOnError(service.superAdmin.removeAdmin(teacherId))
     }
     mutate()
   }
@@ -21,7 +22,7 @@ export default function AdminEditor() {
           <tr>
             <th>姓名</th>
             <th>手机号码</th>
-            <th>管理员</th>
+            <th>院级管理员</th>
           </tr>
         </thead>
 

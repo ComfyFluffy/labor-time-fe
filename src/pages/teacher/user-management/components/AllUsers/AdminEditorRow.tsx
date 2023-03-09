@@ -7,7 +7,7 @@ export interface RowProps {
 }
 
 export default function AdminEditorRow({ teacher, onChange }: RowProps) {
-  const checked = teacher.role_id === 1
+  const checked = teacher.role_id === 2
   return (
     <tr>
       <td scope="row">{teacher.name}</td>

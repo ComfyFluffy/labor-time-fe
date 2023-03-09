@@ -1,5 +1,5 @@
 import { BaseService } from './base'
-import { Category, Class, Student, Teacher } from './model'
+import { Category, Class, School, Student, Teacher } from './model'
 import { TeacherClassRelation } from './teacher'
 import { UserType } from './model'
 
@@ -82,8 +82,12 @@ export class SuperAdminService extends BaseService {
     })
   }
 
+  useSchools = () => {
+    return this.useGet<School[]>('/v2/teacher/admin/college')
+  }
+
   useSchoolPassedData = (schoolYear: string) => {
-    return this.useGet<SchoolAdminService>(
+    return this.useGet<SchoolPassDataResponse>(
       '/v2/teacher/statistics/pass/college',
       {
         school_year: schoolYear,
@@ -96,13 +100,13 @@ export class SuperAdminService extends BaseService {
   }
 
   addAdmin = async (teacherId: number) => {
-    await this.axios.post('/v2/teacaher/admin', {
+    await this.axios.post('/v2/teacher/admin', {
       teacher_id: teacherId,
     })
   }
 
   removeAdmin = async (teacherId: number) => {
-    await this.axios.post('/v2/teacaher/admin/delete', {
+    await this.axios.post('/v2/teacher/admin/delete', {
       teacher_id: teacherId,
     })
   }

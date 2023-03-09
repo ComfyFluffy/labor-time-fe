@@ -1,6 +1,6 @@
-import { SxProps as MuiSxProps, Theme as MuiTheme } from '@mui/material'
+import { Theme } from '@mui/joy'
 
-export const rowOnHover: MuiSxProps<MuiTheme> = (theme) => ({
+export const rowOnHover = (theme: Theme) => ({
   '&:hover': {
     backgroundColor: theme.vars.palette.primary.softBg,
   },

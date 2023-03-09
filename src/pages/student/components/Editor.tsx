@@ -1,4 +1,4 @@
-import { Alert, Button, Stack } from '@mui/joy'
+import { Alert, Button, Stack, Typography } from '@mui/joy'
 import ErrorIcon from '@mui/icons-material/Error'
 import AddIcon from '@mui/icons-material/Add'
 import { LaborItem } from '../../../services/model'
@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import ItemEditor from '../../../components/ItemEditor'
 import Explanation from './Explanation'
 import { CategoryWithNewItem, NewLaborItem } from '../../../utils/types'
+import { Info } from '@mui/icons-material'
 
 export interface EditorProps {
   category: CategoryWithNewItem
@@ -44,6 +45,12 @@ export default function Editor({
               onChange={onUpdateItem}
             />
           ))}
+          {!items.length && (
+            <Alert startDecorator={<Info />} color="neutral">
+              <Typography>当前类别没有项目。</Typography>
+              <Typography>你可以点击下方按钮添加项目。</Typography>
+            </Alert>
+          )}
         </Stack>
 
         <Button variant="soft" startDecorator={<AddIcon />} onClick={onAddItem}>

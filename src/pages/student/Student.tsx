@@ -1,4 +1,4 @@
-import { Alert, Button, Container, Stack, Typography } from '@mui/joy'
+import { Button, Container, Stack, Typography } from '@mui/joy'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import PublishIcon from '@mui/icons-material/Publish'
@@ -223,7 +223,13 @@ export default function Student() {
       }}
     >
       <Header />
-      <ApiErrorAlert error={error} />
+      <ApiErrorAlert
+        error={error}
+        sx={{
+          mt: 2,
+          mb: 1,
+        }}
+      />
       {content}
     </Container>
   )
