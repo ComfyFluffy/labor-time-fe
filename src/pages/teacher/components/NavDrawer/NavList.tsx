@@ -1,41 +1,14 @@
-import {
-  Groups,
-  KeyboardArrowRight,
-  PieChart,
-  Settings,
-  SupervisorAccount,
-} from '@mui/icons-material'
-import {
-  Alert,
-  Chip,
-  List,
-  ListDivider,
-  ListItem,
-  ListItemButton,
-  listItemButtonClasses,
-  ListItemContent,
-  ListItemDecorator,
-  Stack,
-  Typography,
-} from '@mui/joy'
-import { Collapse } from '@mui/material'
-import { Link, useMatch } from 'react-router-dom'
-import { shallow } from 'zustand/shallow'
-import { roleIdToRole } from '../../../../services/model'
+import { PieChart, Settings, SupervisorAccount } from '@mui/icons-material'
+import { Alert, List, ListDivider, ListItem } from '@mui/joy'
+import { useMatch } from 'react-router-dom'
 import { service } from '../../../../services/service'
 import { usePreferences } from '../../../../utils/store'
+import CollapseList from './CollapseList'
 import NavListButton, { NavListButtonProps } from './NavListButton'
+import TeacherCard from './TeacherCard'
 
 export default function NavList() {
-  const { classListOpen, setClassListOpen, selectedSchoolYear } =
-    usePreferences(
-      ({ classListOpen, setClassListOpen, selectedSchoolYear }) => ({
-        classListOpen,
-        setClassListOpen,
-        selectedSchoolYear,
-      }),
-      shallow
-    )
+  const selectedSchoolYear = usePreferences((state) => state.selectedSchoolYear)
   const { data: teacherData, error: teacherError } =
     service.teacher.useSelfInfo()
   const { data: classesData, error: classesError } =
@@ -86,24 +59,7 @@ export default function NavList() {
         </Alert>
       )}
 
-      {teacherData && (
-        <ListItem>
-          <Stack
-            sx={{
-              px: 2,
-              py: 1,
-            }}
-            spacing={1}
-            alignItems="start"
-          >
-            <Stack direction="row" alignItems="baseline" spacing={1}>
-              <Typography fontSize="xl">{teacherData.name}</Typography>
-              <Typography fontSize="xs">{teacherData.phone}</Typography>
-            </Stack>
-            <Chip size="sm">{roleIdToRole.get(teacherData.role_id)}</Chip>
-          </Stack>
-        </ListItem>
-      )}
+      {teacherData && <TeacherCard {...teacherData} />}
 
       <ListDivider />
 
@@ -113,64 +69,24 @@ export default function NavList() {
         </ListItem>
       ))}
 
-      <ListItem
-        nested
-        sx={{
-          my: '6px',
-        }}
-      >
-        <ListItemButton onClick={() => setClassListOpen(!classListOpen)}>
-          <ListItemDecorator>
-            <Groups />
-          </ListItemDecorator>
-          <ListItemContent>班级列表</ListItemContent>
-          <KeyboardArrowRight
-            sx={{
-              transform: classListOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-              transition: 'transform 0.3s',
-            }}
-          />
-        </ListItemButton>
+      {teacherData && teacherData.role_id <= 2 && (
+        <CollapseList
+          emptyText="暂无班级"
+          title="班级列表"
+          items={
+            classesData?.map((item) => ({
+              name: item.name,
+              to: `/teacher/class/${item.id}`,
+              id: item.id,
+            })) || []
+          }
+          itemSelected={(item) =>
+            classRouteMatch?.params.classId === item.id.toString()
+          }
+        />
+      )}
 
-        <Collapse in={classListOpen} unmountOnExit timeout="auto">
-          {classesData && (
-            <List
-              sx={{
-                [`& .${listItemButtonClasses.root}`]: {
-                  pl: 7,
-                },
-                [`& .${listItemButtonClasses.selected}`]: {
-                  fontWeight: 'inherit',
-                },
-              }}
-            >
-              {classesData.map((item) => {
-                const match =
-                  classRouteMatch?.params.classId === String(item.id)
-                return (
-                  <ListItem key={item.id}>
-                    <ListItemButton
-                      selected={match}
-                      variant={match ? 'soft' : undefined}
-                      component={Link}
-                      to={`/teacher/class/${item.id}`}
-                    >
-                      {item.name}
-                    </ListItemButton>
-                  </ListItem>
-                )
-              })}
-              {!classesData.length && (
-                <ListItem>
-                  <ListItemButton disabled>暂无班级</ListItemButton>
-                </ListItem>
-              )}
-            </List>
-          )}
-        </Collapse>
-      </ListItem>
-
-      {teacherData?.role_id >= 1 && (
+      {teacherData && teacherData.role_id >= 1 && (
         <>
           <ListDivider />
           {adminLinks.map((item) => (
