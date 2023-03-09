@@ -25,7 +25,15 @@ export default function Admin() {
         setOpen={setTemporaryDrawerOpen}
         variant={upLg ? 'permanent' : 'temporary'}
       />
-      <Stack component="main" flex={1}>
+      <Stack
+        component="main"
+        flex={1}
+        sx={(theme) => ({
+          backgroundColor:
+            theme.palette.mode === 'light' ? '#fbfbfb' : undefined,
+          minHeight: '100vh',
+        })}
+      >
         <AppBar
           onMenuClick={() => setTemporaryDrawerOpen((v) => !v)}
           showMenuButton={!upLg}
