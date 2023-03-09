@@ -76,9 +76,9 @@ export class StudentService extends BaseService {
     deleteIds: number[]
   ) => {
     await Promise.all([
-      this.addLaborItems(addRequest),
-      this.modifyLaborItems(modifyRequest),
-      this.deleteLaborItems(deleteIds),
+      addRequest.length && this.addLaborItems(addRequest),
+      modifyRequest.length && this.modifyLaborItems(modifyRequest),
+      deleteIds.length && this.deleteLaborItems(deleteIds),
     ])
   }
 }
