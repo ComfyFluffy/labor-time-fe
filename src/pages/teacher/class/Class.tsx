@@ -1,5 +1,4 @@
 import {
-  Alert,
   Button,
   Chip,
   ColorPaletteProp,
@@ -16,7 +15,7 @@ import {
   TableRow,
   useMediaQuery,
 } from '@mui/material'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { service } from '../../../services/service'
 import { Student, StudentState, studentStates } from '../../../services/model'
@@ -27,6 +26,7 @@ import Autocomplete from '@mui/joy/Autocomplete'
 import { rowOnHover } from '../../../utils/styles'
 import { toastProcess } from '../../../utils/toast'
 import { usePreferences } from '../../../utils/store'
+import ApiErrorAlert from '../../../components/ApiErrorAlert'
 
 export type ClassViewParams = {
   classId: string
@@ -59,7 +59,6 @@ const studentStateDisplay: Record<
 
 const ClassWithProps = ({ classId }: { classId: number }) => {
   const { data, error, mutate } = service.teacher.useClassStudents(classId)
-  const { data: classesData } = service.teacher.useManagedClasses()
 
   const [viewerItem, setViewerItem] = useState<Student | null>(null)
 
@@ -67,11 +66,6 @@ const ClassWithProps = ({ classId }: { classId: number }) => {
 
   const [searchText, setSearchText] = useState('')
   const [stateFilter, setStateFilter] = useState<StudentState | null>(null)
-
-  const className = useMemo(
-    () => classesData?.find((c) => c.id === classId)?.name,
-    [classesData, classId]
-  )
 
   const theme = useTheme()
   const upSm = useMediaQuery(theme.breakpoints.up('sm'))
@@ -91,9 +85,7 @@ const ClassWithProps = ({ classId }: { classId: number }) => {
 
   return (
     <Stack spacing={2}>
-      {error && <Alert color="danger">获取班级数据失败：{error.message}</Alert>}
-
-      {className && <Typography level="h4">{className}</Typography>}
+      <ApiErrorAlert error={error} />
 
       <Stack direction="row" spacing={2} alignItems="center">
         <Button

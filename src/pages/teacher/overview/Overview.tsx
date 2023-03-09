@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom'
 import { rowOnHover } from '../../../utils/styles'
 import { toastProcess } from '../../../utils/toast'
 import { ClassesStatsResponse } from '../../../services/teacher'
+import ApiErrorAlert from '../../../components/ApiErrorAlert'
+import ClassesOverview from './components/ClassesOverview'
 
 const FlexCenter = styled('div')({
   display: 'flex',
@@ -62,8 +64,11 @@ const Row = ({
     </TableRow>
   )
 }
-
 export default function Overview() {
+  return <ClassesOverview schoolId={1} schoolYear={'2022-2023'} />
+}
+
+export function Overview1() {
   const [selectedClassIds, setSelectedClassIds] = useState(new Set<number>())
 
   const [xlsxDownloading, setXlsxDownloading] = useState(false)
@@ -100,7 +105,7 @@ export default function Overview() {
 
   return (
     <Stack spacing={2}>
-      {error && <Alert color="danger">获取班级数据失败：{error.message}</Alert>}
+      <ApiErrorAlert error={error} />
 
       <Typography level="h3">软件学院</Typography>
 

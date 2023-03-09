@@ -20,6 +20,7 @@ import {
 } from '../../utils/types'
 import { LaborItem } from '../../services/model'
 import MenuButton from '../../components/MenuButton'
+import ApiErrorAlert from '../../components/ApiErrorAlert'
 
 let itemLocalId = 0
 
@@ -222,11 +223,7 @@ export default function Student() {
       }}
     >
       <Header />
-      {error && (
-        <Alert color="danger" sx={{ my: 2 }}>
-          获取数据失败：{String(error)}
-        </Alert>
-      )}
+      <ApiErrorAlert error={error} />
       {content}
     </Container>
   )

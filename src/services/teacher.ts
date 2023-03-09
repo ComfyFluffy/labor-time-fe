@@ -19,23 +19,17 @@ export interface TeacherClassRelation {
   class_id: number
 }
 
+// export type ClassesStatsResponse = {
+//   class: Class
+//   statistics: {
+//     total: number
+//     all_approved: number
+//     has_pending_item: number
+//     has_reject_item: number
+//     not_submitted: number
+//   }
+// }[]
 export type ClassesStatsResponse = {
-  class: Class
-  statistics: {
-    total: number
-    all_approved: number
-    has_pending_item: number
-    has_reject_item: number
-    not_submitted: number
-  }
-}[]
-
-export interface SchoolYearsResponse {
-  school_years: string[]
-  current_school_year: string
-}
-
-export type PassedClassesResponse = {
   class_id: number
   classname: string
   pass_hour: number
@@ -43,13 +37,26 @@ export type PassedClassesResponse = {
   total_student: number
 }[]
 
-export type PassedStudentsResponse = {
-  student_id: number
-  uid: string
-  name: string
-  total_hour: number
-  is_passed: boolean
-}[]
+export interface SchoolYearsResponse {
+  school_years: string[]
+  current_school_year: string
+}
+
+// export type PassedClassesResponse = {
+//   class_id: number
+//   classname: string
+//   pass_hour: number
+//   pass_student: number
+//   total_student: number
+// }[]
+
+// export type PassedStudentsResponse = {
+//   student_id: number
+//   uid: string
+//   name: string
+//   total_hour: number
+//   is_passed: boolean
+// }[]
 
 export class TeacherService extends BaseService {
   useManagedClasses = (schoolYear: string | null, schoolId: number | null) => {
@@ -94,20 +101,6 @@ export class TeacherService extends BaseService {
     return this.useGet<SchoolYearsResponse>('/v2/teacher/school_year')
   }
 
-  useStatistics = (schoolYear: string, schoolId: number) => {
-    return this.useGet<ClassesStatsResponse>('/v2/teacher/statistics', {
-      school_year: schoolYear,
-      college_id: schoolId,
-    })
-  }
-
-  usePassedClasses = (schoolYear: string, schoolId: number) => {
-    return this.useGet<PassedClassesResponse>('/v2/teacher/statistics/passed', {
-      school_year: schoolYear,
-      college_id: schoolId,
-    })
-  }
-
   // FIXIT: remove schoolYear
   usePassedStudent = (classId: number, schoolYear: string) => {
     return this.useGet<PassedStudentsResponse>(
@@ -115,6 +108,17 @@ export class TeacherService extends BaseService {
       {
         class_id: classId,
         school_year: schoolYear,
+      }
+    )
+  }
+
+  // FIXIT: remove schoolId
+  useClassesStats = (schoolYear: string, schoolId: number) => {
+    return this.useGet<ClassesStatsResponse>(
+      '/v2/teacher/statistics/pass/class',
+      {
+        school_year: schoolYear,
+        college_id: schoolId,
       }
     )
   }
