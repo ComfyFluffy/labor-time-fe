@@ -20,30 +20,6 @@ export interface ClassesOverviewProps {
   schoolYear: string
 }
 
-const getBarOptions = (
-  axisColor?: string
-): ComponentProps<typeof Bar>['options'] => ({
-  indexAxis: 'y',
-  responsive: true,
-  scales: {
-    x: {
-      ticks: {
-        format: {
-          style: 'percent',
-        },
-        color: axisColor,
-      },
-      suggestedMax: 1,
-      suggestedMin: 0,
-    },
-    y: {
-      ticks: {
-        color: axisColor,
-      },
-    },
-  },
-})
-
 export default function ClassesOverview({
   schoolId,
   schoolYear,
@@ -81,7 +57,39 @@ export default function ClassesOverview({
         },
       ],
     }
-    return [chartData, getBarOptions(theme.palette.neutral[400])]
+    const axisColor = theme.palette.neutral[400]
+    const chartOptions: ComponentProps<typeof Bar>['options'] = {
+      indexAxis: 'y',
+      responsive: true,
+      scales: {
+        x: {
+          ticks: {
+            format: {
+              style: 'percent',
+            },
+            color: axisColor,
+          },
+          suggestedMax: 1,
+          suggestedMin: 0,
+        },
+        y: {
+          ticks: {
+            color: axisColor,
+          },
+        },
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            footer: ([{ dataIndex }]) => {
+              const { pass_student, total_student } = data[dataIndex]
+              return `通过人数：${pass_student} / ${total_student}`
+            },
+          },
+        },
+      },
+    }
+    return [chartData, chartOptions]
   }, [data, theme])
 
   return (
