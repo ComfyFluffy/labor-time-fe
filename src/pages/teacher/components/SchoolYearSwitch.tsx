@@ -13,10 +13,12 @@ export default function SchoolYearSwitch() {
   )
 
   useEffect(() => {
+    if (!data) {
+      return
+    }
     if (
-      data &&
-      (selectedSchoolYear === null ||
-        !data.school_years.includes(selectedSchoolYear))
+      selectedSchoolYear === null ||
+      !data.school_years.includes(selectedSchoolYear)
     ) {
       setSelectedSchoolYear(data.current_school_year || null)
     }
