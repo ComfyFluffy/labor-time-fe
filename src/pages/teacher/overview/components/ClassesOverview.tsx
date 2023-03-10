@@ -1,67 +1,12 @@
-import { Card, Stack, Theme, Typography, useTheme } from '@mui/joy'
-import { ComponentProps, useMemo } from 'react'
-import { Bar } from 'react-chartjs-2'
+import { Card, Stack, Typography, useTheme } from '@mui/joy'
+import { ComponentRef, useMemo, useRef, ComponentProps } from 'react'
+import { Bar, getElementAtEvent } from 'react-chartjs-2'
 
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Tooltip,
-} from 'chart.js'
 import ApiErrorAlert from '../../../../components/ApiErrorAlert'
 import PassRateInfo from './PassRateInfo'
 import { service } from '../../../../services/service'
-import { alpha } from '@mui/material'
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
-
-const getPassingBarOptions = (
-  labels: string[],
-  data: number[],
-  footer: (index: number) => string,
-  theme: Theme
-) => {
-  const chartData: ComponentProps<typeof Bar>['data'] = {
-    labels,
-    datasets: [
-      {
-        label: '通过率',
-        data,
-        backgroundColor: alpha(theme.palette.success[400], 0.7),
-      },
-    ],
-  }
-  const axisColor = theme.palette.neutral[400]
-  const chartOptions: ComponentProps<typeof Bar>['options'] = {
-    indexAxis: 'y',
-    responsive: true,
-    scales: {
-      x: {
-        ticks: {
-          format: {
-            style: 'percent',
-          },
-          color: axisColor,
-        },
-        suggestedMax: 1,
-        suggestedMin: 0,
-      },
-      y: {
-        ticks: {
-          color: axisColor,
-        },
-      },
-    },
-    plugins: {
-      tooltip: {
-        callbacks: {
-          footer: ([{ dataIndex }]) => footer(dataIndex),
-        },
-      },
-    },
-  }
-  return { data: chartData, options: chartOptions }
-}
+import { calculatePassingRate, getPassingBarOptions } from './barUtils'
+import { useNavigate } from 'react-router-dom'
 
 export interface ClassesOverviewProps {
   schoolId: number
@@ -74,18 +19,7 @@ export default function ClassesOverview({
 }: ClassesOverviewProps) {
   const { data, error } = service.teacher.useClassesStats(schoolYear, schoolId)
 
-  const passedRate = useMemo(() => {
-    if (!data) {
-      return
-    }
-    let total_sum = 0
-    let approved_sum = 0
-    for (const { pass_student, total_student } of data) {
-      total_sum += total_student
-      approved_sum += pass_student
-    }
-    return ((approved_sum / total_sum) * 100).toFixed(1)
-  }, [data])
+  const passingRate = useMemo(() => data && calculatePassingRate(data), [data])
 
   const theme = useTheme()
 
@@ -102,17 +36,32 @@ export default function ClassesOverview({
     [data, theme]
   )
 
+  const chartRef = useRef<ComponentRef<typeof Bar>>(null)
+
+  const navigate = useNavigate()
+
+  const handleChartClick: ComponentProps<typeof Bar>['onClick'] = (e) => {
+    if (!chartRef.current || !data) {
+      return
+    }
+    // Navigate to the class page when the user clicks on a bar
+    const element = getElementAtEvent(chartRef.current as never, e)
+    if (!element.length) {
+      return
+    }
+    navigate(`/teacher/class/${data[element[0].index].class_id}`)
+  }
   return (
     <Stack spacing={2}>
       <ApiErrorAlert error={error} />
 
       {data && data[0] && <PassRateInfo threshold={data[0].pass_hour} />}
 
-      {passedRate && (
+      {passingRate && (
         <Card>
           <Stack spacing={1}>
             <Typography color="success" level="h2">
-              {passedRate}%
+              {passingRate}%
             </Typography>
             <Typography color="neutral">
               总通过率（{data?.length ?? 0} 个班级）
@@ -126,7 +75,13 @@ export default function ClassesOverview({
           <Typography color="neutral" level="h5">
             全部班级通过率
           </Typography>
-          <Bar data={chart.data} options={chart.options} width="100%" />
+          <Bar
+            data={chart.data}
+            options={chart.options}
+            width="100%"
+            ref={chartRef}
+            onClick={handleChartClick}
+          />
         </Card>
       )}
     </Stack>

@@ -68,7 +68,7 @@ const Row = ({
 }
 export default function Overview() {
   const selectedSchoolYear = usePreferences((state) => state.selectedSchoolYear)
-  return <SchoolsOverview schoolYear={selectedSchoolYear} />
+  return <ClassesOverview schoolId={1} schoolYear={selectedSchoolYear} />
 }
 
 export function Overview1() {
