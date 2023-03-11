@@ -36,7 +36,14 @@ export default function NavList() {
     >
       <ApiErrorAlert error={error} />
 
-      {user && <TeacherCard {...user} />}
+      {user && (
+        <TeacherCard
+          name={user.name}
+          phone={user.phone}
+          roleId={user.role_id}
+          schoolName={user.college_name}
+        />
+      )}
 
       <ListDivider />
 
