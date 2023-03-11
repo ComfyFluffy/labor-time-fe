@@ -75,10 +75,9 @@ export type SchoolPassDataResponse = {
 }[]
 
 export class SuperAdminService extends BaseService {
-  useTeachers = (schoolId: number, schoolYear: string) => {
+  useTeachers = (schoolId: number) => {
     return this.useGet<(Teacher & { classes: Class[] })[]>('/v2/teacher/info', {
       college_id: schoolId,
-      school_year: schoolYear,
     })
   }
 
