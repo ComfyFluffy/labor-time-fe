@@ -1,6 +1,5 @@
 import { BaseService } from './base'
 import { Category, Class, School, Student, Teacher } from './model'
-import { TeacherClassRelation } from './teacher'
 import { UserType } from './model'
 
 export interface AddStudentRequest {
@@ -8,16 +7,30 @@ export interface AddStudentRequest {
   class_id: number
 }
 
-export type TeacherWithClasses = Teacher & {
+export type TeacherWithClasses = Omit<
+  Teacher,
+  'college_id' | 'college_name'
+> & {
   classes: Class[]
 }
+
+export type AddTeacherRequest = Pick<Teacher, 'name' | 'phone' | 'role_id'>
+
+export type ModifyTeacherRequest = Pick<
+  Teacher,
+  'id' | 'name' | 'phone' | 'role_id'
+>
 
 export class SchoolAdminService extends BaseService {
   resetPassword = async (account: string, userType: UserType) => {
     this.axios.post(`/v2/teacher/${userType}/reset`, { account })
   }
 
-  addTeacherClassRelations = async (relations: TeacherClassRelation[]) => {
+  addTeacherClassRelations = async (teacherId: number, classIds: number[]) => {
+    const relations = classIds.map((classId) => ({
+      teacher_id: teacherId,
+      class_id: classId,
+    }))
     await this.axios.post('/v2/teacher/class2teacher', relations)
   }
 
@@ -37,15 +50,15 @@ export class SchoolAdminService extends BaseService {
     await this.axios.delete(`/v2/teacher/labor/type?id=${id}`)
   }
 
-  addTeacher = async (teacher: Pick<Teacher, 'name' | 'phone' | 'role_id'>) => {
-    return await this.axios.post<{
-      id: number
-    }>('/v2/teacher/info', teacher)
+  addTeacher = async (teacher: AddTeacherRequest) => {
+    return (
+      await this.axios.post<{
+        id: number
+      }>('/v2/teacher/info', teacher)
+    ).data.id
   }
 
-  modifyTeacher = async (
-    teacher: Pick<Teacher, 'id' | 'name' | 'phone' | 'role_id'>
-  ) => {
+  modifyTeacher = async (teacher: ModifyTeacherRequest) => {
     await this.axios.put('/v2/teacher/info', teacher)
   }
 

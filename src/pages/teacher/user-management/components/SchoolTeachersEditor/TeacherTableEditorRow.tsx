@@ -8,7 +8,7 @@ import TeacherEditor from './TeacherEditor'
 export interface TeacherTableEditorRowProps {
   teacher: TeacherWithClasses
   isNew?: boolean
-  onMutated: (teacher: TeacherWithClasses | null) => void
+  onMutated: (teacher?: TeacherWithClasses) => void
 }
 
 export default function TeacherTableEditorRow({
@@ -46,8 +46,8 @@ export default function TeacherTableEditorRow({
         <td scope="row">{teacher.name}</td>
         <td>{teacher.phone}</td>
         <td>
-          <Chip size="sm" color={teacher.is_admin ? 'primary' : 'neutral'}>
-            {teacher.is_admin ? '是' : '否'}
+          <Chip size="sm" color={teacher.role_id === 2 ? 'primary' : 'neutral'}>
+            {teacher.role_id === 2 ? '是' : '否'}
           </Chip>
         </td>
       </Box>

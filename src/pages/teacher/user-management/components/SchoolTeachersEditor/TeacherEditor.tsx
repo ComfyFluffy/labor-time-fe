@@ -1,3 +1,21 @@
+import { Delete, Remove, Save } from '@mui/icons-material'
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  IconButton,
+  Input,
+  Stack,
+  Switch,
+  Table,
+  Typography,
+} from '@mui/joy'
+import { useMemo, useState } from 'react'
+import { TeacherWithClasses } from '../../../../../services/admin'
+import { Class } from '../../../../../services/model'
+import { service } from '../../../../../services/service'
+import { toastOnError, toastProcess } from '../../../../../utils/toast'
+
 export default function TeacherEditor({
   teacher,
   onMutated,
@@ -17,7 +35,7 @@ export default function TeacherEditor({
   const [editingState, setEditingState] = useState({
     name: teacher.name,
     phone: teacher.phone,
-    is_admin: teacher.is_admin,
+    role_id: teacher.role_id,
   })
 
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -34,29 +52,29 @@ export default function TeacherEditor({
     try {
       let id = teacher.id
       if (isNew) {
-        await service.toast(async () => {
-          id = await service.addTeacher({
+        await toastProcess(async () => {
+          id = await service.schoolAdmin.addTeacher({
             name: editingState.name,
             phone: editingState.phone,
-            is_admin: editingState.is_admin,
+            role_id: editingState.role_id,
           })
-          await service.addTeacherClassRelations(
+          await service.schoolAdmin.addTeacherClassRelations(
             id,
             Array.from(addedClasses.keys())
           )
         })
       } else {
-        await service.toast(
+        await toastProcess(
           Promise.all([
-            service.updateTeacher({
+            service.schoolAdmin.modifyTeacher({
               id: teacher.id,
               ...editingState,
             }),
-            service.addTeacherClassRelations(
+            service.schoolAdmin.addTeacherClassRelations(
               teacher.id,
               Array.from(addedClasses.keys())
             ),
-            service.deleteTeacherClassRelations(
+            service.schoolAdmin.deleteTeacherClassRelations(
               teacher.id,
               Array.from(removedClassIds)
             ),
@@ -79,7 +97,7 @@ export default function TeacherEditor({
 
   const handleDelete = async () => {
     try {
-      await service.toastOnError(service.deleteTeacher(teacher.id))
+      await toastOnError(service.schoolAdmin.deleteTeacher(teacher.id))
     } finally {
       onMutated()
     }
@@ -132,7 +150,7 @@ export default function TeacherEditor({
 
       <Stack>
         <Typography level="h6">管理的班级</Typography>
-        <Table size="small" aria-label="purchases">
+        <Table size="sm">
           <thead>
             <tr>
               <th>班级名称</th>
@@ -141,9 +159,9 @@ export default function TeacherEditor({
           </thead>
           <tbody>
             {displayClasses.map((c) => (
-              <TableRow key={c.id}>
-                <TableCell>{c.name}</TableCell>
-                <TableCell align="right">
+              <tr key={c.id}>
+                <td>{c.name}</td>
+                <td align="right">
                   <IconButton
                     size="sm"
                     color="danger"
@@ -155,10 +173,10 @@ export default function TeacherEditor({
                       }
                     }}
                   >
-                    <RemoveIcon />
+                    <Remove />
                   </IconButton>
-                </TableCell>
-              </TableRow>
+                </td>
+              </tr>
             ))}
             <tr>
               <ClassesAutocomplete
@@ -173,17 +191,13 @@ export default function TeacherEditor({
       </Stack>
 
       <Stack direction="row" spacing={2}>
-        <Button
-          color="success"
-          startDecorator={<SaveIcon />}
-          onClick={handleSave}
-        >
+        <Button color="success" startDecorator={<Save />} onClick={handleSave}>
           {isNew ? '创建用户' : '保存'}
         </Button>
         {!isNew && (
           <Button
             color="danger"
-            startDecorator={<DeleteIcon />}
+            startDecorator={<Delete />}
             onClick={() => setDeleteOpen(true)}
           >
             删除用户
