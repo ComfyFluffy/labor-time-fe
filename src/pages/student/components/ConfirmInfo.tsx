@@ -25,7 +25,13 @@ export default function ConfirmInfo() {
           </Stack>
 
           {error && <Alert color="danger">获取个人信息失败</Alert>}
-          {data && <StudentInfo student={data} />}
+          {data && (
+            <StudentInfo
+              name={data.name}
+              uid={data.uid}
+              className={data.classname}
+            />
+          )}
 
           <Button variant="solid" onClick={() => confirmPersonalInfo()}>
             确认

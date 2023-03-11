@@ -1,5 +1,6 @@
 import {
   FormControl,
+  FormHelperText,
   FormLabel,
   formLabelClasses,
   Input,
@@ -19,14 +20,17 @@ const StyledInput = styled(Input)(({ theme, color }) => ({
 
 export default function InputWithLabel({
   label,
+  helperText,
   ...props
 }: {
   label: string
+  helperText?: string
 } & React.ComponentProps<typeof StyledInput>) {
   return (
     <FormControl>
       <FormLabel>{label}</FormLabel>
       <StyledInput {...props} />
+      {helperText && <FormHelperText>{helperText}</FormHelperText>}
     </FormControl>
   )
 }
