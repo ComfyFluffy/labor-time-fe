@@ -1,4 +1,4 @@
-import { PieChart, Settings, SupervisorAccount } from '@mui/icons-material'
+import { PieChart, SupervisorAccount } from '@mui/icons-material'
 import { List, ListDivider, ListItem } from '@mui/joy'
 import ApiErrorAlert from '../../../../components/ApiErrorAlert'
 import { service } from '../../../../services/service'
