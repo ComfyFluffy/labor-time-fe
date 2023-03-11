@@ -132,6 +132,12 @@ export class TeacherService extends BaseService {
     })
   }
 
+  usePassHourThreshold = () => {
+    return this.useGet<{
+      pass_hour: number
+    }>('/v2/teacher/statistics/pass/hour')
+  }
+
   // FIXIT: update to v2
   downloadXlsxByClassIds = async (
     classIds: number[],
