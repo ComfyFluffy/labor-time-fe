@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom'
 import { makeLazy } from '../../utils/lazy'
+import Settings from './settings/Settings'
 
 const Teacher = makeLazy(() => import('./Teacher'))
 const Overview = makeLazy(() => import('./overview/Overview'))
@@ -19,5 +20,6 @@ export const teacherRoute = () => ({
     },
     { path: 'class/:classId', element: <Class /> },
     { path: 'user-management', element: <UserManagement /> },
+    { path: 'settings', element: <Settings /> },
   ],
 })

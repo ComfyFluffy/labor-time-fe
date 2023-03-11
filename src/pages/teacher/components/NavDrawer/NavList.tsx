@@ -1,4 +1,4 @@
-import { PieChart, SupervisorAccount } from '@mui/icons-material'
+import { PieChart, Settings, SupervisorAccount } from '@mui/icons-material'
 import { List, ListDivider, ListItem } from '@mui/joy'
 import ApiErrorAlert from '../../../../components/ApiErrorAlert'
 import { service } from '../../../../services/service'
@@ -27,6 +27,12 @@ export default function NavList() {
     },
   ]
 
+  const settingsLink: NavListButtonProps = {
+    to: '/teacher/settings',
+    title: '系统设置',
+    Icon: Settings,
+  }
+
   return (
     <List
       sx={{
@@ -53,7 +59,7 @@ export default function NavList() {
         </ListItem>
       ))}
 
-      {user && selectedSchoolYear && (
+      {user && user.role_id !== 3 && selectedSchoolYear && (
         <ClassNavList
           schoolId={user.college_id}
           schoolYear={selectedSchoolYear}
@@ -69,6 +75,12 @@ export default function NavList() {
             </ListItem>
           ))}
         </>
+      )}
+
+      {user && user.role_id === 2 && (
+        <ListItem>
+          <NavListButton {...settingsLink} />
+        </ListItem>
       )}
     </List>
   )
