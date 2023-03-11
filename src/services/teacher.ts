@@ -19,16 +19,16 @@ export interface TeacherClassRelation {
   class_id: number
 }
 
-// export type ClassesStatsResponse = {
-//   class: Class
-//   statistics: {
-//     total: number
-//     all_approved: number
-//     has_pending_item: number
-//     has_reject_item: number
-//     not_submitted: number
-//   }
-// }[]
+export type ClassesStatsDetailResponse = {
+  class: Class
+  statistics: {
+    total: number
+    all_approved: number
+    has_pending_item: number
+    has_reject_item: number
+    not_submitted: number
+  }
+}[]
 export type ClassesStatsResponse = {
   class_id: number
   classname: string
@@ -102,15 +102,15 @@ export class TeacherService extends BaseService {
   }
 
   // FIXIT: remove schoolYear
-  usePassedStudent = (classId: number, schoolYear: string) => {
-    return this.useGet<PassedStudentsResponse>(
-      '/v2/teacher/statistics/pass/student',
-      {
-        class_id: classId,
-        school_year: schoolYear,
-      }
-    )
-  }
+  // usePassedStudent = (classId: number, schoolYear: string) => {
+  //   return this.useGet<PassedStudentsResponse>(
+  //     '/v2/teacher/statistics/pass/student',
+  //     {
+  //       class_id: classId,
+  //       school_year: schoolYear,
+  //     }
+  //   )
+  // }
 
   // FIXIT: remove schoolId
   useClassesStats = (schoolYear: string, schoolId: number) => {
@@ -121,6 +121,13 @@ export class TeacherService extends BaseService {
         college_id: schoolId,
       }
     )
+  }
+
+  useStatsDetail = (schoolYear: string, schoolId: number) => {
+    return this.useGet<ClassesStatsDetailResponse>('/v2/teacher/statistics', {
+      school_year: schoolYear,
+      college_id: schoolId,
+    })
   }
 
   // FIXIT: update to v2

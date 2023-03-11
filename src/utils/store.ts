@@ -1,14 +1,14 @@
 import { create } from 'zustand'
 import { persist, subscribeWithSelector } from 'zustand/middleware'
-import { UserType } from '../services/model'
+import { School, UserType } from '../services/model'
 
 export interface PreferencesStore {
   personalInfoConfirmed: boolean
   confirmPersonalInfo: () => void
-  classListOpen: boolean
-  setClassListOpen: (open: boolean) => void
   selectedSchoolYear: string | null
   setSelectedSchoolYear: (schoolYear: string | null) => void
+  selectedSchool: School | null
+  setSelectedSchool: (school: School | null) => void
 
   token?: string
   loggedUserType?: UserType
@@ -21,7 +21,6 @@ export const usePreferences = create<PreferencesStore>()(
     persist(
       (set) => ({
         personalInfoConfirmed: false,
-        classListOpen: true,
         confirmPersonalInfo: () =>
           set({
             personalInfoConfirmed: true,
@@ -36,14 +35,15 @@ export const usePreferences = create<PreferencesStore>()(
             token: undefined,
             loggedUserType: undefined,
           }),
-        setClassListOpen: (classListOpen) =>
-          set({
-            classListOpen,
-          }),
         selectedSchoolYear: null,
         setSelectedSchoolYear: (selectedSchoolYear) =>
           set({
             selectedSchoolYear,
+          }),
+        selectedSchool: null,
+        setSelectedSchool: (selectedSchool) =>
+          set({
+            selectedSchool,
           }),
       }),
       {

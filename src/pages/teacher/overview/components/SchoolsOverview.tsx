@@ -1,4 +1,4 @@
-import { Card, Stack, Typography, useTheme } from '@mui/joy'
+import { Stack, Typography, useTheme } from '@mui/joy'
 import { useMemo } from 'react'
 import { Bar } from 'react-chartjs-2'
 import ApiErrorAlert from '../../../../components/ApiErrorAlert'
@@ -37,25 +37,23 @@ export default function SchoolsOverview({ schoolYear }: SchoolsOverviewProps) {
       {data && data[0] && <PassRateInfo />}
 
       {passingRate && (
-        <Card>
-          <Stack spacing={1}>
-            <Typography color="success" level="h2">
-              {passingRate}%
-            </Typography>
-            <Typography color="neutral">
-              总通过率（{data?.length ?? 0} 个学院）
-            </Typography>
-          </Stack>
-        </Card>
+        <Stack spacing={1}>
+          <Typography color="success" level="h2">
+            {passingRate}%
+          </Typography>
+          <Typography color="neutral">
+            总通过率（{data?.length ?? 0} 个学院）
+          </Typography>
+        </Stack>
       )}
 
       {chart && (
-        <Card component={Stack} alignItems="center" spacing={2}>
+        <Stack alignItems="center" spacing={2}>
           <Typography color="neutral" level="h5">
             全部学院通过率
           </Typography>
           <Bar data={chart.data} options={chart.options} width="100%" />
-        </Card>
+        </Stack>
       )}
     </Stack>
   )

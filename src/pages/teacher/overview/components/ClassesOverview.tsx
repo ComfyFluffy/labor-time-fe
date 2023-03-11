@@ -1,4 +1,4 @@
-import { Card, Stack, Typography, useTheme } from '@mui/joy'
+import { Alert, Stack, Typography, useTheme } from '@mui/joy'
 import { ComponentRef, useMemo, useRef, ComponentProps } from 'react'
 import { Bar, getElementAtEvent } from 'react-chartjs-2'
 
@@ -58,31 +58,29 @@ export default function ClassesOverview({
       {data && data[0] && <PassRateInfo threshold={data[0].pass_hour} />}
 
       {passingRate && (
-        <Card>
-          <Stack spacing={1}>
-            <Typography color="success" level="h2">
-              {passingRate}%
-            </Typography>
-            <Typography color="neutral">
-              总通过率（{data?.length ?? 0} 个班级）
-            </Typography>
-          </Stack>
-        </Card>
+        <Alert color="success" component={Stack} spacing={1}>
+          <Typography color="success" level="h2">
+            {passingRate}%
+          </Typography>
+          <Typography color="neutral">
+            总通过率（{data?.length ?? 0} 个班级）
+          </Typography>
+        </Alert>
       )}
 
       {chart && (
-        <Card component={Stack} alignItems="center" spacing={2}>
+        <Stack alignItems="center" spacing={2}>
           <Typography color="neutral" level="h5">
             全部班级通过率
           </Typography>
           <Bar
             data={chart.data}
             options={chart.options}
-            width="100%"
+            width="90%"
             ref={chartRef}
             onClick={handleChartClick}
           />
-        </Card>
+        </Stack>
       )}
     </Stack>
   )
