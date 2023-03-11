@@ -23,7 +23,7 @@ export default function AppBar({ onMenuClick, showMenuButton }: NavBarProps) {
         right: 0,
         zIndex: 100,
 
-        backdropFilter: 'blur(8px)',
+        backdropFilter: 'blur(8px) saturate(180%)',
         backgroundColor: 'rgba(255, 255, 255, 0.8)',
         [theme.getColorSchemeSelector('dark')]: {
           backgroundColor: `rgba(${theme.vars.palette.neutral.darkChannel} / 0.8)`,
