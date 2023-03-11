@@ -25,12 +25,6 @@ export default function NavList() {
       title: '教师用户管理',
       Icon: SupervisorAccount,
     },
-
-    {
-      to: '/teacher/system-management',
-      title: '系统管理',
-      Icon: Settings,
-    },
   ]
 
   return (
