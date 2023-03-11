@@ -8,6 +8,10 @@ export interface AddStudentRequest {
   class_id: number
 }
 
+export type TeacherWithClasses = Teacher & {
+  classes: Class[]
+}
+
 export class SchoolAdminService extends BaseService {
   resetPassword = async (account: string, userType: UserType) => {
     this.axios.post(`/v2/teacher/${userType}/reset`, { account })
@@ -33,22 +37,20 @@ export class SchoolAdminService extends BaseService {
     await this.axios.delete(`/v2/teacher/labor/type?id=${id}`)
   }
 
-  addTeacher = async (teacher: Omit<Teacher, 'id' | 'college_id'>) => {
+  addTeacher = async (teacher: Pick<Teacher, 'name' | 'phone' | 'role_id'>) => {
     return await this.axios.post<{
       id: number
     }>('/v2/teacher/info', teacher)
   }
 
-  modifyTeacher = async (teacher: Omit<Teacher, 'college_id'>) => {
+  modifyTeacher = async (
+    teacher: Pick<Teacher, 'id' | 'name' | 'phone' | 'role_id'>
+  ) => {
     await this.axios.put('/v2/teacher/info', teacher)
   }
 
   useTeachers = () => {
-    return this.useGet<
-      Teacher & {
-        classes: Class[]
-      }
-    >('/v2/teacher/class2teacher')
+    return this.useGet<TeacherWithClasses[]>('/v2/teacher/class2teacher')
   }
 
   addStudent = async (request: AddStudentRequest) => {

@@ -1,8 +1,9 @@
 import { Box, Chip, ColorPaletteProp, Table } from '@mui/joy'
-import { Student, StudentState } from '../../../../services/model'
+import { StudentState } from '../../../../services/model'
+import { StudentWithoutClass } from '../../../../services/teacher'
 import { rowOnHover } from '../../../../utils/styles'
 
-const studentStateDisplay: Record<
+export const studentStateDisplay: Record<
   StudentState,
   {
     color: ColorPaletteProp
@@ -28,8 +29,8 @@ const studentStateDisplay: Record<
 }
 
 export interface ClassTableProps {
-  students: Student[]
-  onRowClick?: (student: Student) => void
+  students: StudentWithoutClass[]
+  onRowClick?: (student: StudentWithoutClass) => void
 }
 
 export default function ClassTable({ students, onRowClick }: ClassTableProps) {
@@ -44,10 +45,10 @@ export default function ClassTable({ students, onRowClick }: ClassTableProps) {
           <th>学号</th>
           <th>姓名</th>
           <Box
+            component="th"
             sx={{
               maxWidth: 0o100,
             }}
-            component="th"
           >
             有效时长
           </Box>
@@ -55,17 +56,22 @@ export default function ClassTable({ students, onRowClick }: ClassTableProps) {
         </tr>
       </thead>
 
-      <tbody>
+      <Box
+        component="tbody"
+        sx={{
+          cursor: onRowClick ? 'pointer' : undefined,
+        }}
+      >
         {students.map((student) => {
           const stateDisplay = studentStateDisplay[student.state]
           return (
             <Box
+              component="tr"
               key={student.uid}
               onClick={() => {
                 onRowClick?.(student)
               }}
               sx={onRowClick && rowOnHover}
-              component="tr"
             >
               <td>{student.uid}</td>
               <td>{student.name}</td>
@@ -78,7 +84,7 @@ export default function ClassTable({ students, onRowClick }: ClassTableProps) {
             </Box>
           )
         })}
-      </tbody>
+      </Box>
     </Table>
   )
 }

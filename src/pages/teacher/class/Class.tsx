@@ -1,33 +1,18 @@
-import {
-  Button,
-  Chip,
-  ColorPaletteProp,
-  Input,
-  Stack,
-  Typography,
-  useTheme,
-} from '@mui/joy'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  useMediaQuery,
-} from '@mui/material'
+import { Button, Input, Stack, Typography, useTheme } from '@mui/joy'
+import { useMediaQuery } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { service } from '../../../services/service'
-import { Student, StudentState, studentStates } from '../../../services/model'
-import { Viewer } from './Viewer'
+import { StudentState, studentStates } from '../../../services/model'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import EditIcon from '@mui/icons-material/Edit'
 import Autocomplete from '@mui/joy/Autocomplete'
-import { rowOnHover } from '../../../utils/styles'
 import { toastProcess } from '../../../utils/toast'
 import { usePreferences } from '../../../utils/store'
 import ApiErrorAlert from '../../../components/ApiErrorAlert'
-import ClassTable from './components/ClassTable'
+import ClassTable, { studentStateDisplay } from './components/ClassTable'
+import { StudentWithoutClass } from '../../../services/teacher'
+import LaborViewer from './components/LaborViewer'
 
 export type ClassViewParams = {
   classId: string
@@ -36,7 +21,7 @@ export type ClassViewParams = {
 const ClassWithProps = ({ classId }: { classId: number }) => {
   const { data, error, mutate } = service.teacher.useClassStudents(classId)
 
-  const [viewerItem, setViewerItem] = useState<Student | null>(null)
+  const [viewerItem, setViewerItem] = useState<StudentWithoutClass | null>(null)
 
   const [xlsxDownloading, setXlsxDownloading] = useState(false)
 
@@ -71,7 +56,7 @@ const ClassWithProps = ({ classId }: { classId: number }) => {
             try {
               setXlsxDownloading(true)
               await toastProcess(
-                service.teacher.downloadXlsxByClassIds([classId]),
+                service.teacher.downloadXlsxByClassIds([classId], '-1', -1),
                 '下载'
               )
             } finally {
@@ -113,7 +98,7 @@ const ClassWithProps = ({ classId }: { classId: number }) => {
       {filteredData && (
         <>
           {viewerItem && (
-            <Viewer
+            <LaborViewer
               student={viewerItem}
               open={viewerItem !== null}
               onClose={() => {

@@ -9,8 +9,8 @@ export interface RejectLaborItemRequest {
 
 export interface PassLaborItemRequest {
   id: number
-  reason?: string
-  description?: string
+  reason: string
+  description: string
   approved_hour: number
 }
 
@@ -58,6 +58,8 @@ export interface SchoolYearsResponse {
 //   is_passed: boolean
 // }[]
 
+export type StudentWithoutClass = Omit<Student, 'classname' | 'class_id'>
+
 export class TeacherService extends BaseService {
   useManagedClasses = (schoolYear: string | null, schoolId: number | null) => {
     if (schoolYear === null || schoolId === null) {
@@ -70,7 +72,7 @@ export class TeacherService extends BaseService {
   }
 
   useClassStudents = (classId: number) => {
-    return this.useGet<Omit<Student, 'classname'>[]>('/v2/teacher/student', {
+    return this.useGet<StudentWithoutClass[]>('/v2/teacher/student', {
       class_id: classId,
     })
   }
@@ -86,11 +88,11 @@ export class TeacherService extends BaseService {
   }
 
   rejectLaborItem = async (request: RejectLaborItemRequest) => {
-    await this.axios.post('/v2/labor/teacher/reject', request)
+    await this.axios.post('/v2/teacher/labor/reject', request)
   }
 
   passLaborItem = async (request: PassLaborItemRequest) => {
-    await this.axios.post('/v2/labor/teacher/pass', request)
+    await this.axios.post('/v2/teacher/labor/pass', request)
   }
 
   useSelfInfo = () => {
