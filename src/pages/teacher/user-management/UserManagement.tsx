@@ -1,9 +1,9 @@
 import { service } from '../../../services/service'
 import AdminEditor from './components/AdminEditor'
-import SchoolUsersEditor from './components/SchoolUsersEditor'
+import SchoolTeachersEditor from './components/SchoolTeachersEditor'
 
 export default function UserManagement() {
   const { data } = service.teacher.useSelfInfo()
 
-  return data?.role_id === 3 ? <AdminEditor /> : <SchoolUsersEditor />
+  return data?.role_id === 3 ? <AdminEditor /> : <SchoolTeachersEditor />
 }

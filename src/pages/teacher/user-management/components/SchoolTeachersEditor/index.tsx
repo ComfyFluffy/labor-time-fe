@@ -1,8 +1,9 @@
-import { Stack } from '@mui/joy'
+import { Add } from '@mui/icons-material'
+import { Button, Stack } from '@mui/joy'
 import ApiErrorAlert from '../../../../../components/ApiErrorAlert'
 import { service } from '../../../../../services/service'
 
-export default function SchoolUsersEditor() {
+export default function SchoolTeachersEditor() {
   const { data, error, mutate } = service.schoolAdmin.useTeachers()
 
   return (
@@ -19,7 +20,7 @@ export default function SchoolUsersEditor() {
       >
         <Button
           color="success"
-          startDecorator={<AddIcon />}
+          startDecorator={<Add />}
           onClick={() => {
             setAddedTeacher({
               id: 0,
