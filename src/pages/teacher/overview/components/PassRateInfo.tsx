@@ -1,7 +1,7 @@
 import { Info } from '@mui/icons-material'
 import { Alert, Stack, Typography } from '@mui/joy'
 
-interface PassRateInfoProps {
+export interface PassRateInfoProps {
   threshold?: number
 }
 

@@ -29,7 +29,7 @@ export default function Overview() {
         {isSuperAdmin && selectedSchoolYear && (
           <SelectSchool schoolYear={selectedSchoolYear} />
         )}
-        {selfInfo && selectedSchoolYear && (
+        {!isSuperAdmin && selfInfo && selectedSchoolYear && (
           <ClassesOverview
             schoolId={selfInfo.college_id}
             schoolYear={selectedSchoolYear}
