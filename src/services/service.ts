@@ -68,6 +68,7 @@ export class Service extends BaseService {
 
   logout = () => {
     usePreferences.getState().logout()
+    location.replace('/')
   }
 
   updatePassword = async (

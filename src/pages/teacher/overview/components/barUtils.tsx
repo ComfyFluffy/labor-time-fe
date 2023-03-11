@@ -1,6 +1,6 @@
-import { Theme } from '@mui/joy'
+import { Box, Theme } from '@mui/joy'
 import { alpha } from '@mui/material'
-import { ComponentProps } from 'react'
+import { ComponentProps, ReactNode } from 'react'
 import { Bar } from 'react-chartjs-2'
 
 export const getPassingBarOptions = (
@@ -47,6 +47,7 @@ export const getPassingBarOptions = (
         },
       },
     },
+    maintainAspectRatio: false,
   }
   return { data: chartData, options: chartOptions }
 }
@@ -67,4 +68,23 @@ export const calculatePassingRate = (
     approved_sum += pass_student
   }
   return ((approved_sum / total_sum) * 100).toFixed(1)
+}
+
+export const BarChartContainer = ({
+  children,
+  itemCount,
+}: {
+  children: ReactNode
+  itemCount: number
+}) => {
+  return (
+    <Box
+      sx={{
+        width: 1,
+        height: itemCount * 25 + 30,
+      }}
+    >
+      {children}
+    </Box>
+  )
 }

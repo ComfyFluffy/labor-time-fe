@@ -1,9 +1,13 @@
-import { Stack, Typography, useTheme } from '@mui/joy'
+import { Alert, Stack, Typography, useTheme } from '@mui/joy'
 import { useMemo } from 'react'
 import { Bar } from 'react-chartjs-2'
 import ApiErrorAlert from '../../../../components/ApiErrorAlert'
 import { service } from '../../../../services/service'
-import { calculatePassingRate, getPassingBarOptions } from './barUtils'
+import {
+  BarChartContainer,
+  calculatePassingRate,
+  getPassingBarOptions,
+} from './barUtils'
 import PassRateInfo from './PassRateInfo'
 
 export interface SchoolsOverviewProps {
@@ -37,14 +41,14 @@ export default function SchoolsOverview({ schoolYear }: SchoolsOverviewProps) {
       {data && data[0] && <PassRateInfo />}
 
       {passingRate && (
-        <Stack spacing={1}>
+        <Alert color="success" component={Stack} spacing={1}>
           <Typography color="success" level="h2">
             {passingRate}%
           </Typography>
           <Typography color="neutral">
             总通过率（{data?.length ?? 0} 个学院）
           </Typography>
-        </Stack>
+        </Alert>
       )}
 
       {chart && (
@@ -52,7 +56,9 @@ export default function SchoolsOverview({ schoolYear }: SchoolsOverviewProps) {
           <Typography color="neutral" level="h5">
             全部学院通过率
           </Typography>
-          <Bar data={chart.data} options={chart.options} width="100%" />
+          <BarChartContainer itemCount={chart.data.labels?.length || 0}>
+            <Bar data={chart.data} options={chart.options} />
+          </BarChartContainer>
         </Stack>
       )}
     </Stack>

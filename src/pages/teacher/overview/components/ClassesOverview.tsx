@@ -5,7 +5,11 @@ import { Bar, getElementAtEvent } from 'react-chartjs-2'
 import ApiErrorAlert from '../../../../components/ApiErrorAlert'
 import PassRateInfo from './PassRateInfo'
 import { service } from '../../../../services/service'
-import { calculatePassingRate, getPassingBarOptions } from './barUtils'
+import {
+  BarChartContainer,
+  calculatePassingRate,
+  getPassingBarOptions,
+} from './barUtils'
 import { useNavigate } from 'react-router-dom'
 
 export interface ClassesOverviewProps {
@@ -73,13 +77,14 @@ export default function ClassesOverview({
           <Typography color="neutral" level="h5">
             全部班级通过率
           </Typography>
-          <Bar
-            data={chart.data}
-            options={chart.options}
-            width="90%"
-            ref={chartRef}
-            onClick={handleChartClick}
-          />
+          <BarChartContainer itemCount={chart.data.labels?.length || 0}>
+            <Bar
+              data={chart.data}
+              options={chart.options}
+              ref={chartRef}
+              onClick={handleChartClick}
+            />
+          </BarChartContainer>
         </Stack>
       )}
     </Stack>
