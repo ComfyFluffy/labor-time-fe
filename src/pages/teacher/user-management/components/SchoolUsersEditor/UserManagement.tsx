@@ -283,13 +283,13 @@ const TeacherEditor = ({
       <Stack>
         <Typography level="h6">管理的班级</Typography>
         <Table size="small" aria-label="purchases">
-          <TableHead>
-            <TableRow>
-              <TableCell>班级名称</TableCell>
-              <TableCell />
-            </TableRow>
-          </TableHead>
-          <TableBody>
+          <thead>
+            <tr>
+              <th>班级名称</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
             {displayClasses.map((c) => (
               <TableRow key={c.id}>
                 <TableCell>{c.name}</TableCell>
@@ -310,15 +310,15 @@ const TeacherEditor = ({
                 </TableCell>
               </TableRow>
             ))}
-            <TableRow>
+            <tr>
               <ClassesAutocomplete
                 onAdd={(value) => {
                   setAddedClasses(new Map(addedClasses.set(value.id, value)))
                 }}
                 selectedClasses={displayClasses}
               />
-            </TableRow>
-          </TableBody>
+            </tr>
+          </tbody>
         </Table>
       </Stack>
 
