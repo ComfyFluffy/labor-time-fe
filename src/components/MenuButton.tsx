@@ -37,7 +37,7 @@ export default function MenuButton<T>({
       </Button>
       <Menu
         anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
+        open={!!anchorEl}
         onClose={() => {
           setAnchorEl(null)
         }}
