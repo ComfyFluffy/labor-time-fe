@@ -7,7 +7,6 @@ import { CssVarsProvider } from '@mui/joy'
 import { theme } from './utils/theme'
 import { App } from './App'
 import './index.css'
-import './utils/chartRegister'
 
 enableMapSet()
 

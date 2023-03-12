@@ -5,6 +5,8 @@ import ClassesOverview from './components/ClassesOverview'
 import SchoolsOverview from './components/SchoolsOverview'
 import SelectSchool from './components/SelectSchool'
 
+import './chartRegister'
+
 export default function Overview() {
   const selectedSchoolYear = usePreferences((state) => state.selectedSchoolYear)
 
