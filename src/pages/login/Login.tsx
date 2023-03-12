@@ -157,7 +157,7 @@ export default function Login() {
               }}
               variant="soft"
               size="lg"
-              disabled={submitting}
+              loading={submitting}
             >
               登录
             </Button>

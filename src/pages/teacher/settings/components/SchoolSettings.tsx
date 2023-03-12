@@ -41,11 +41,7 @@ const ModifyPassHourThreshold = ({
         onChange={(e) => setInputHours(e.target.value)}
       />
       <Box>
-        <Button
-          variant="solid"
-          onClick={handleSubmission}
-          disabled={submitting}
-        >
+        <Button variant="solid" onClick={handleSubmission} loading={submitting}>
           保存
         </Button>
       </Box>

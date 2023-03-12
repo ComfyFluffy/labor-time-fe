@@ -58,7 +58,7 @@ export const AskReject = ({ onSuccess, itemId }: AskProps) => {
           color="danger"
           variant="soft"
           type="submit"
-          disabled={submitting}
+          loading={submitting}
         >
           打回
         </Button>
@@ -130,7 +130,7 @@ export const AskPass = ({
           color="danger"
           variant="soft"
           type="submit"
-          disabled={submitting}
+          loading={submitting}
         >
           通过
         </Button>
