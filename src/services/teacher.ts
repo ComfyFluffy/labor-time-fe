@@ -138,21 +138,11 @@ export class TeacherService extends BaseService {
     }>('/v2/teacher/statistics/pass/hour')
   }
 
-  // FIXIT: update to v2
-  downloadXlsxByClassIds = async (
-    classIds: number[],
-    schoolYear: string,
-    schoolId: number
-  ) => {
-    if (!schoolYear) {
-      throw new Error('schoolYear is required')
-    }
-    const r = await this.axios.post(
-      `/v2/teacher/statistics?${new URLSearchParams({
+  downloadXlsx = async (schoolYear: string) => {
+    const r = await this.axios.get(
+      `/v2/teacher/statistics/excel/class?${new URLSearchParams({
         school_year: schoolYear,
-        college_id: String(schoolId),
       })}`,
-      classIds,
       {
         responseType: 'blob',
       }

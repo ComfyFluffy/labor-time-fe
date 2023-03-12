@@ -1,13 +1,10 @@
-import { Button, Input, Stack, Typography, useTheme } from '@mui/joy'
+import { Input, Stack, Typography, useTheme } from '@mui/joy'
 import { useMediaQuery } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { service } from '../../../services/service'
 import { StudentState, studentStates } from '../../../services/model'
-import FileDownloadIcon from '@mui/icons-material/FileDownload'
-import EditIcon from '@mui/icons-material/Edit'
 import Autocomplete from '@mui/joy/Autocomplete'
-import { toastProcess } from '../../../utils/toast'
 import { usePreferences } from '../../../utils/store'
 import ApiErrorAlert from '../../../components/ApiErrorAlert'
 import ClassTable, { studentStateDisplay } from './components/ClassTable'
@@ -22,8 +19,6 @@ const ClassWithProps = ({ classId }: { classId: number }) => {
   const { data, error, mutate } = service.teacher.useClassStudents(classId)
 
   const [viewerItem, setViewerItem] = useState<StudentWithoutClass | null>(null)
-
-  const [xlsxDownloading, setXlsxDownloading] = useState(false)
 
   const [searchText, setSearchText] = useState('')
   const [stateFilter, setStateFilter] = useState<StudentState | null>(null)
@@ -47,30 +42,6 @@ const ClassWithProps = ({ classId }: { classId: number }) => {
   return (
     <Stack spacing={2}>
       <ApiErrorAlert error={error} />
-
-      <Stack direction="row" spacing={2} alignItems="center">
-        <Button
-          startDecorator={<FileDownloadIcon />}
-          color="primary"
-          onClick={async () => {
-            try {
-              setXlsxDownloading(true)
-              await toastProcess(
-                service.teacher.downloadXlsxByClassIds([classId], '-1', -1),
-                '下载'
-              )
-            } finally {
-              setXlsxDownloading(false)
-            }
-          }}
-          disabled={!data || xlsxDownloading}
-        >
-          导出表格
-        </Button>
-        <Button startDecorator={<EditIcon />} color="success" disabled={!data}>
-          添加学生
-        </Button>
-      </Stack>
 
       <Stack
         direction={upSm ? 'row' : 'column'}

@@ -1,3 +1,4 @@
+import fileDownload from 'js-file-download'
 import { BaseService } from './base'
 import { Category, Class, School, Student, Teacher } from './model'
 import { UserType } from './model'
@@ -154,5 +155,24 @@ export class SuperAdminService extends BaseService {
     await this.axios.post('/v2/teacher/admin/delete', {
       teacher_id: teacherId,
     })
+  }
+
+  downloadXlsx = async (schoolYear: string, school: School) => {
+    const r = await this.axios.get(
+      `/v2/teacher/statistics/excel/college?${new URLSearchParams({
+        school_year: schoolYear,
+        college_id: school.id.toString(),
+      })}`,
+      {
+        responseType: 'blob',
+      }
+    )
+    fileDownload(
+      r.data,
+      `学生信息-${schoolYear}-${school.name}-${new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace('T', '-')}.xlsx`
+    )
   }
 }

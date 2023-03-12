@@ -11,6 +11,7 @@ import {
   getPassingBarOptions,
 } from './barUtils'
 import { useNavigate } from 'react-router-dom'
+import DownloadButton from '../../../../components/DownloadButton'
 
 export interface ClassesOverviewProps {
   schoolId: number
@@ -22,6 +23,7 @@ export default function ClassesOverview({
   schoolYear,
 }: ClassesOverviewProps) {
   const { data, error } = service.teacher.useClassesStats(schoolYear, schoolId)
+  const { data: selfInfo } = service.teacher.useSelfInfo()
 
   const passingRate = useMemo(() => data && calculatePassingRate(data), [data])
 
@@ -55,9 +57,19 @@ export default function ClassesOverview({
     }
     navigate(`/teacher/class/${data[element[0].index].class_id}`)
   }
+
   return (
     <Stack spacing={2}>
       <ApiErrorAlert error={error} />
+
+      {selfInfo && selfInfo.role_id !== 3 && (
+        <Stack direction="row">
+          <DownloadButton
+            downloadFn={() => service.teacher.downloadXlsx(schoolYear)}
+            text="导出表格"
+          />
+        </Stack>
+      )}
 
       {data && data[0] && <PassRateInfo threshold={data[0].pass_hour} />}
 
