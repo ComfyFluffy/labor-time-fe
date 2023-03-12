@@ -22,19 +22,20 @@ import { LaborItem } from '../../services/model'
 import MenuButton from '../../components/MenuButton'
 import ApiErrorAlert from '../../components/ApiErrorAlert'
 
-let itemLocalId = 0
+type LocalId = number
+let itemLocalId: LocalId = 0
 
 export default function Student() {
   const [currentItemIndex, setCurrentItemIndex] = useState(0)
 
   const emptyItemsActions = () => ({
-    added: new Map<number, NewLaborItem>(), // local id -> item
-    updated: new Map<number, UpdateLaborItem>(), // item id -> item
+    added: new Map<LocalId, NewLaborItem>(),
+    updated: new Map<UpdateLaborItem['id'], UpdateLaborItem>(),
     removedIds: new Set<number>(),
   })
   const [itemsActions, setItemsActions] = useState({
-    added: new Map<number, NewLaborItem>(), // local id -> item
-    updated: new Map<number, UpdateLaborItem>(), // item id -> item
+    added: new Map<LocalId, NewLaborItem>(),
+    updated: new Map<UpdateLaborItem['id'], UpdateLaborItem>(),
     removedIds: new Set<number>(),
   })
 
@@ -191,7 +192,7 @@ export default function Student() {
               localCategories.length
             }`}</Typography>
 
-            {currentItemIndex + 1 !== localCategories.length ? (
+            {currentItemIndex < localCategories.length ? (
               <Button
                 endDecorator={<KeyboardArrowRight />}
                 onClick={() => {
