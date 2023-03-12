@@ -1,4 +1,5 @@
 import { Alert, Stack } from '@mui/joy'
+import SchoolSelector from '../../../../components/SchoolSelector'
 import { usePreferences } from '../../../../utils/store'
 import ClassesOverview from './ClassesOverview'
 
@@ -10,6 +11,8 @@ export default function SelectSchool({ schoolYear }: SelectSchoolProps) {
 
   return (
     <Stack spacing={2} sx={{ mt: 1 }}>
+      <SchoolSelector />
+
       {schoolYear && selectedSchool && (
         <ClassesOverview schoolId={selectedSchool.id} schoolYear={schoolYear} />
       )}
