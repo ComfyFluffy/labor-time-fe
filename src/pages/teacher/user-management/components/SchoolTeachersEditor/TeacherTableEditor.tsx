@@ -13,14 +13,7 @@ export default function TeacherTableEditor() {
   )
 
   return (
-    <Stack
-      direction="row"
-      spacing={2}
-      justifyContent="end"
-      sx={{
-        mt: 2,
-      }}
-    >
+    <Stack spacing={2}>
       <ApiErrorAlert error={error} />
 
       <Table aria-label="collapsible table">
@@ -59,22 +52,24 @@ export default function TeacherTableEditor() {
           )}
         </tbody>
       </Table>
-      <Button
-        color="success"
-        startDecorator={<Add />}
-        onClick={() => {
-          setAddedTeacher({
-            id: 0,
-            name: '',
-            phone: '',
-            role_id: 1,
-            classes: [],
-          })
-        }}
-        disabled={addedTeacher !== null}
-      >
-        添加用户
-      </Button>
+      <Stack alignItems="flex-end">
+        <Button
+          color="success"
+          startDecorator={<Add />}
+          onClick={() => {
+            setAddedTeacher({
+              id: 0,
+              name: '',
+              phone: '',
+              role_id: 1,
+              classes: [],
+            })
+          }}
+          disabled={addedTeacher !== null}
+        >
+          添加用户
+        </Button>
+      </Stack>
     </Stack>
   )
 }

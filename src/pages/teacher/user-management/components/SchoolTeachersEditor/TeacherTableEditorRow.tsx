@@ -51,34 +51,32 @@ export default function TeacherTableEditorRow({
           </Chip>
         </td>
       </Box>
-
       <tr>
-        <Box
-          component="td"
+        <Collapse
+          in={open}
+          timeout="auto"
+          unmountOnExit
+          appear
           sx={{
-            pb: 0,
-            pt: 0,
-            border: open ? undefined : 'unset',
+            p: 1,
+            maxWidth: 0o700,
           }}
-          colSpan={5}
         >
-          <Collapse
-            in={open}
-            timeout="auto"
-            unmountOnExit
-            appear
-            sx={{
-              p: 1,
-              maxWidth: 0o700,
-            }}
-          >
-            <TeacherEditor
-              teacher={teacher}
-              onMutated={onMutated}
-              isNew={isNew}
-            />
-          </Collapse>
-        </Box>
+          <Box component="td" colSpan={4}>
+            <Box
+              sx={{
+                width: 0o700,
+                maxWidth: '80vw',
+              }}
+            >
+              <TeacherEditor
+                teacher={teacher}
+                onMutated={onMutated}
+                isNew={isNew}
+              />
+            </Box>
+          </Box>
+        </Collapse>
       </tr>
     </>
   )

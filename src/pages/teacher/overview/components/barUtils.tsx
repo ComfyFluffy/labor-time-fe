@@ -81,7 +81,7 @@ export const BarChartContainer = ({
     <Box
       sx={{
         width: 1,
-        height: itemCount * 25 + 30,
+        height: itemCount * 25 + 50,
       }}
     >
       {children}

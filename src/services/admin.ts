@@ -26,12 +26,30 @@ export class SchoolAdminService extends BaseService {
     this.axios.post(`/v2/teacher/${userType}/reset`, { account })
   }
 
-  addTeacherClassRelations = async (teacherId: number, classIds: number[]) => {
-    const relations = classIds.map((classId) => ({
+  private relationsFromIds(teacherId: number, classIds: number[]) {
+    return classIds.map((classId) => ({
       teacher_id: teacherId,
       class_id: classId,
     }))
-    await this.axios.post('/v2/teacher/class2teacher', relations)
+  }
+
+  addTeacherClassRelations = async (teacherId: number, classIds: number[]) => {
+    if (classIds.length === 0) {
+      return
+    }
+    const relations = this.relationsFromIds(teacherId, classIds)
+    await this.axios.post('/v2/teacher/class/teacher', relations)
+  }
+
+  deleteTeacherClassRelations = async (
+    teacherId: number,
+    classIds: number[]
+  ) => {
+    if (classIds.length === 0) {
+      return
+    }
+    const relations = this.relationsFromIds(teacherId, classIds)
+    await this.axios.post('/v2/teacher/class/teacher/delete', relations)
   }
 
   addLaborCategories = async (categories: Category[]) => {
@@ -62,8 +80,21 @@ export class SchoolAdminService extends BaseService {
     await this.axios.put('/v2/teacher/info', teacher)
   }
 
+  deleteTeacher = async (teacherId: number) => {
+    await this.axios.delete(`/v2/teacher/info?id=${teacherId}`)
+  }
+
   useTeachers = () => {
-    return this.useGet<TeacherWithClasses[]>('/v2/teacher/class2teacher')
+    const { data, ...rest } = this.useGet<TeacherWithClasses[]>(
+      '/v2/teacher/class/teacher'
+    )
+    return {
+      data: data?.map((teacher) => ({
+        ...teacher,
+        classes: teacher.classes ? teacher.classes : [],
+      })),
+      ...rest,
+    }
   }
 
   addStudent = async (request: AddStudentRequest) => {

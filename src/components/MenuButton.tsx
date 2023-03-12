@@ -6,8 +6,8 @@ export type MenuButtonProps<T> = {
   selectedItem: T | null
   items: T[]
   onChange: (item: T) => void
-  display: (item: T) => string
-  itemId: (item: T) => string | number
+  display?: (item: T) => string
+  itemId?: (item: T) => string | number
   size?: ButtonProps['size']
 } & Omit<BoxProps, 'display' | 'id' | 'onChange'>
 
@@ -15,8 +15,8 @@ export default function MenuButton<T>({
   selectedItem,
   items,
   onChange,
-  display,
-  itemId,
+  display = (item) => String(item),
+  itemId = (item) => String(item),
   size,
   ...rest
 }: MenuButtonProps<T>) {

@@ -6,15 +6,17 @@ import {
   IconButton,
   Input,
   Stack,
-  Switch,
   Table,
   Typography,
 } from '@mui/joy'
 import { useMemo, useState } from 'react'
+import MenuButton from '../../../../../components/MenuButton'
 import { TeacherWithClasses } from '../../../../../services/admin'
-import { Class } from '../../../../../services/model'
+import { Class, roleIdToRole } from '../../../../../services/model'
 import { service } from '../../../../../services/service'
 import { toastOnError, toastProcess } from '../../../../../utils/toast'
+import ClassesAutocomplete from './ClassesAutocomplete'
+import DeleteConfirmDialog from './DeleteConfirmDialog'
 
 export default function TeacherEditor({
   teacher,
@@ -25,9 +27,9 @@ export default function TeacherEditor({
   onMutated: (teacher?: TeacherWithClasses) => void
   isNew?: boolean
 }) {
-  const [addedClasses, setAddedClasses] = useState<Map<number, Class>>(
+  const [addedClasses, setAddedClasses] = useState<Map<Class['id'], Class>>(
     () => new Map()
-  ) // Class id -> Class
+  )
   const [removedClassIds, setRemovedClassIds] = useState<Set<number>>(
     () => new Set()
   )
@@ -41,10 +43,12 @@ export default function TeacherEditor({
   const [deleteOpen, setDeleteOpen] = useState(false)
 
   const displayClasses = useMemo(() => {
+    const removeDuplicate = (c: Class, i: number, classes: Class[]) =>
+      classes.findIndex((c2) => c2.id === c.id) === i
     const classes = [
       ...teacher.classes.filter((c) => !removedClassIds.has(c.id)),
       ...addedClasses.values(),
-    ].filter((c, i, classes) => classes.findIndex((c2) => c2.id === c.id) === i)
+    ].filter(removeDuplicate)
     return classes
   }, [teacher.classes, addedClasses, removedClassIds])
 
@@ -134,14 +138,20 @@ export default function TeacherEditor({
           />
         </FormControl>
 
-        <Stack direction="row">
-          <Typography flex={1}>管理员</Typography>
-          <Switch
-            checked={editingState.is_admin}
-            onChange={(e) => {
+        <Stack alignItems="flex-start">
+          <Typography flex={1}>身份</Typography>
+          <MenuButton
+            items={Array.from(roleIdToRole.entries()).slice(0, 2)}
+            selectedItem={
+              Array.from(roleIdToRole.entries()).find(
+                ([id]) => id === editingState.role_id
+              ) || ([0, '未知'] as [number, string])
+            }
+            display={(item) => item[1]}
+            onChange={([role_id]) => {
               setEditingState((prev) => ({
                 ...prev,
-                is_admin: e.target.checked,
+                role_id,
               }))
             }}
           />
