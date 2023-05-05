@@ -192,7 +192,7 @@ export default function Student() {
               localCategories.length
             }`}</Typography>
 
-            {currentItemIndex < localCategories.length ? (
+            {currentItemIndex < localCategories.length - 1 ? (
               <Button
                 endDecorator={<KeyboardArrowRight />}
                 onClick={() => {
