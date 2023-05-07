@@ -9,7 +9,7 @@ export default ({ mode }) => {
     server: {
       proxy: {
         '/api': {
-          target: process.env.VITE_API_URL,
+          target: process.env.PROXY_API_URL,
         },
       },
     },
