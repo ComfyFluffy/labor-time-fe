@@ -86,6 +86,34 @@ export class SchoolAdminService extends BaseService {
   }
 
   useTeachers = () => {
+    return {
+      data: [
+        {
+          id: 1,
+          name: '张三',
+          phone: '1234',
+          role_id: 1,
+          classes: [
+            {
+              id: 1,
+              name: '一班',
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: '李四',
+          phone: '5678',
+          role_id: 1,
+          classes: [
+            {
+              id: 2,
+              name: '二班',
+            },
+          ],
+        },
+      ] as TeacherWithClasses[],
+    }
     const { data, ...rest } = this.useGet<TeacherWithClasses[]>(
       '/v2/teacher/class/teacher'
     )

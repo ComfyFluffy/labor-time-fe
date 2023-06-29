@@ -8,9 +8,9 @@ export default ({ mode }) => {
     plugins: [react()],
     server: {
       proxy: {
-        '/api': {
-          target: process.env.PROXY_API_URL,
-        },
+        // '/api': {
+        //   target: process.env.PROXY_API_URL,
+        // },
       },
     },
   })

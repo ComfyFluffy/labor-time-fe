@@ -96,10 +96,26 @@ export class TeacherService extends BaseService {
   }
 
   useSelfInfo = () => {
+    return {
+      data: {
+        college_id: 1,
+        college_name: '计算机学院',
+        id: 1,
+        name: '张三',
+        phone: '12345678910',
+        role_id: 2,
+      } as Teacher,
+    }
     return this.useGet<Teacher>('/v2/teacher/info/self')
   }
 
   useSchoolYears = () => {
+    return {
+      data: {
+        current_school_year: '2020-2021',
+        school_years: ['2020-2021', '2019-2020'],
+      } as SchoolYearsResponse,
+    }
     return this.useGet<SchoolYearsResponse>('/v2/teacher/school_year')
   }
 
@@ -116,6 +132,24 @@ export class TeacherService extends BaseService {
 
   // FIXIT: remove schoolId
   useClassesStats = (schoolYear: string, schoolId: number) => {
+    return {
+      data: [
+        {
+          class_id: 1,
+          classname: '计算机科学与技术1班',
+          pass_hour: 100,
+          pass_student: 10,
+          total_student: 20,
+        },
+        {
+          class_id: 2,
+          classname: '计算机科学与技术2班',
+          pass_hour: 100,
+          pass_student: 10,
+          total_student: 25,
+        },
+      ] as ClassesStatsResponse,
+    }
     return this.useGet<ClassesStatsResponse>(
       '/v2/teacher/statistics/pass/class',
       {
@@ -133,6 +167,11 @@ export class TeacherService extends BaseService {
   }
 
   usePassHourThreshold = () => {
+    return {
+      data: {
+        pass_hour: 100,
+      },
+    }
     return this.useGet<{
       pass_hour: number
     }>('/v2/teacher/statistics/pass/hour')

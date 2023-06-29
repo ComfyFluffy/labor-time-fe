@@ -23,10 +23,46 @@ export type ModifyLaborItemsRequest = Pick<
 
 export class StudentService extends BaseService {
   useSelfInfo = () => {
+    return {
+      data: {
+        name: '张三',
+        id: 1,
+        uid: '2018000000',
+      },
+    }
     return this.useGet<Student>('/v2/student/info')
   }
 
   useCategories = () => {
+    const mock: Category[] = [
+      {
+        id: 1,
+        name: '学术科技类',
+        explanation: {
+          title: '学术科技类',
+          text: '123',
+        },
+        items: [
+          {
+            id: 1,
+            approved_hour: 3,
+            description: '1233',
+            duration_hour: 3,
+            evidence_urls: [
+              // test images
+              'https://picsum.photos/200/300',
+              'https://picsum.photos/200/300',
+            ],
+            state: 'approved',
+          },
+        ],
+        max_hour: 10,
+        min_hour: 1,
+      },
+    ]
+    return {
+      data: mock,
+    }
     return this.useGet<Category[]>('/v2/student/labor')
   }
 

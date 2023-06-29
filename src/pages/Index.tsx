@@ -9,6 +9,10 @@ export default function Index() {
   )
   const isLoginPage = useMatch('/login')
 
+  if (process.env.NODE_ENV === 'development') {
+    return <Outlet />
+  }
+
   if (!token && !isLoginPage) {
     return <Navigate to="/login" replace />
   }
